@@ -5,7 +5,7 @@ DeclareGlobalFunction("SLStabOfKSpace@");
 
 InstallGlobalFunction(SLStabOfKSpace@,
 function(n,q,k)
-local diag,dir_prod,z,transvec_diag,grp,transvec;
+local diag,dir_prod,z,transvec_diag,transvec;
 
   z:=PrimitiveElement(GF(q));
   diag:=DiagonalMat(Concatenation(Concatenation([z],List([2..n-1],i->1))
