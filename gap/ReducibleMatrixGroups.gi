@@ -1,21 +1,16 @@
-DeclareGlobalFunction("SLStabOfKSpace@");
+# We take the k-space to be (0,  \ldots,  0,  a_1,  \ldots,  a_k)
+InstallGlobalFunction(SLStabilizerOfSubspace,
+    function(n, q, k)
+    local diag, dir_prod, z, transvec_diag, transvec;
 
-#  
-#  * We take the k-space to be (0, \ldots, 0, a_1, \ldots, a_k)
+    z := PrimitiveElement(GF(q));
+    diag := DiagonalMat(Concatenation(Concatenation([z], List([2..n-1], i->1))
+     , [z^-1]));
 
-InstallGlobalFunction(SLStabOfKSpace@,
-function(n,q,k)
-local diag,dir_prod,z,transvec_diag,transvec;
+    dir_prod := MatDirectProduct(SL(n-k, q), SL(k, q));
 
-  z:=PrimitiveElement(GF(q));
-  diag:=DiagonalMat(Concatenation(Concatenation([z],List([2..n-1],i->1))
-   ,[z^-1]));
+    transvec_diag := List([1..n], i->[i, i, 1]);
+    transvec := MatrixByEntries(GF(q), n, n, Concatenation([[1, n-k+1, 1]], diag));
 
-  dir_prod:=MatDirectProduct(SL(n-k,q),SL(k,q));
-  
-  transvec_diag:=List([1..n],i->[i,i,1]);
-  transvec:=MatrixByEntries(GF(q),n,n,Concatenation([[1,n-k+1,1]],diag));
-  
-  return Group(Concatenation([diag],GeneratorsOfGroup(dir_prod),[transvec]));
-  
+    return Group(Concatenation([diag], GeneratorsOfGroup(dir_prod), [transvec]));
 end);
