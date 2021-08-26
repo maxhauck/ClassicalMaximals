@@ -1,5 +1,5 @@
 # We take the k-space to be (0,  \ldots,  0,  a_1,  \ldots,  a_k)
-InstallGlobalFunction(SLStabilizerOfSubspace,
+BindGlobal("SLStabilizerOfSubspace",
     function(n, q, k)
     local diag, dir_prod, z, transvec_diag, transvec;
 
