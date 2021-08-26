@@ -10,7 +10,7 @@ BindGlobal("SLStabilizerOfSubspace",
     dir_prod := MatDirectProduct(SL(n-k, q), SL(k, q));
 
     transvec_diag := List([1..n], i->[i, i, 1]);
-    transvec := MatrixByEntries(GF(q), n, n, Concatenation([[1, n-k+1, 1]], diag));
+    transvec := MatrixByEntries(GF(q), n, n, Concatenation([[1, n-k+1, 1]], transvec_diag));
 
     return Group(Concatenation([diag], GeneratorsOfGroup(dir_prod), [transvec]));
 end);
