@@ -10,7 +10,7 @@ local det, E, gens, i, newGen, newGens, subgroup, z, m;
     newGens := [];
     for i in [1..Length(gens)] do
         det := Determinant(gens[i]);
-        if det=1 then
+        if IsOne(det) then
             Add(newGens, gens[i]);
         else
             #rescale first column by -1
