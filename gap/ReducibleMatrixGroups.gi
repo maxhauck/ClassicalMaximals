@@ -3,7 +3,7 @@ function(n, q, k)
     local diag, dirProd, z, transvecDiag, transvec;
 
     z := PrimitiveElement(GF(q));
-    diag := DiagonalMat(Concatenation(Concatenation([z], List([2..n-1], i->1))
+    diag := DiagonalMat(Concatenation(Concatenation([z], List([2..n-1], i->z^0))
      , [z^-1]));
 
     dirProd := MatDirectProduct(SL(n-k, q), SL(k, q));
