@@ -1,7 +1,6 @@
 InstallGlobalFunction(ImprimitivesMeetSL, 
 function(n, q, t)
 local det, E, gens, i, newGen, newGens, subgroup, z, m;
-    Assert(1, IsPrimePowerInt(q));
     Assert(1, (n mod t)=0);
     Assert(1, t > 1);
     m := QuoInt(n, t);
