@@ -2,8 +2,8 @@
 #! @Chapter Functionality
 #! @Section Example Methods
 #! @Description
-#!   Return the subgroup of $\mathrm{SL}(n, q)$ stabilising the
-#!   $k$-dimensional subspace of $\mathbb{F}_q^n$ consisting of
-#!   all vectors whose first $n-k$ entries are zero.
+#!   Return the subgroup of <M>SL(n, q)</M> stabilising the
+#!   <A>k</A>-dimensional subspace of <M>\mathbb{F}_q^n</M> consisting of
+#!   all vectors whose first <C>n-k</C> entries are zero.
 #! @Arguments n, q, k
 DeclareGlobalFunction("SLStabilizerOfSubspace");
