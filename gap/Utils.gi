@@ -5,7 +5,7 @@ BindGlobal("MatrixByEntries",
 		m := NullMat(nrRows, nrCols, field);
 		o := One(field);
 		for i in entries do
-			m[i[1]][i[2]]:=i[3]*o;
+			m[i[1]][i[2]] := i[3]*o;
 		od;
 	else
 		if nrCols*nrRows<>Length(entries) then
