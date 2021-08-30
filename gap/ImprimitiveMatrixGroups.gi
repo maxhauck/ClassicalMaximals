@@ -20,7 +20,7 @@ local det, E, gens, i, newGen, newGens, subgroup, z, m;
     od;
     z := PrimitiveElement(GF(q));
     E := DiagonalMat(Concatenation([z], List([2..m], i->z^0), 
-           [z^-1], List([m+2..d], i->z^0)));
+           [z^-1], List([m+2..n], i->z^0)));
     Add(newGens, E);
     return Group(newGens);
 end);
