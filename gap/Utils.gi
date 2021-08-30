@@ -1,9 +1,9 @@
 BindGlobal("MatrixByEntries",
 	function(field, nrRows, nrCols, entries)
     	local i, m, o;
+	o := One(field);
 	if ForAll(entries, x -> IsList(x) and Length(x)=3) then
 		m := NullMat(nrRows, nrCols, field);
-		o := One(field);
 		for i in entries do
 			m[i[1]][i[2]] := i[3]*o;
 		od;
