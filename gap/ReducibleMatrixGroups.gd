@@ -1,6 +1,3 @@
-#! @Arguments TODO 
-#! @Description
-#!   Insert documentation for your function here
 #! @Chapter Introduction
 #! @Chapter Functionality
 #! @Section Example Methods

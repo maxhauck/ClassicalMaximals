@@ -1,5 +1,5 @@
 InstallGlobalFunction("SLStabilizerOfSubspace",
-    function(n, q, k)
+function(n, q, k)
     local diag, dir_prod, z, transvec_diag, transvec;
 
     z := PrimitiveElement(GF(q));
