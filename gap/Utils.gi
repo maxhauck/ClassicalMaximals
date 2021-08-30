@@ -1,4 +1,4 @@
-BindGlobal("MatrixByEntries",
+InstallGlobalFunction("MatrixByEntries",
 	function(field, nrRows, nrCols, entries)
     	local i, m, o;
 	o := One(field);
