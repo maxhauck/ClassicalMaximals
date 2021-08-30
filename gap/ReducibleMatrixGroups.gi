@@ -1,9 +1,3 @@
-#! @Chapter Introduction
-#! @Chapter Functionality
-#! @Section Example Methods
-#! @Description
-#!   Insert documentation for your function here
-#!   We take the k-space to be (0,  \ldots,  0,  a_1,  \ldots,  a_k)
 InstallGlobalFunction("SLStabilizerOfSubspace",
     function(n, q, k)
     local diag, dir_prod, z, transvec_diag, transvec;
