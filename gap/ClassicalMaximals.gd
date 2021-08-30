@@ -17,6 +17,7 @@
 # to something like ClassicalMaximalsFromStoredData, then here we could drop
 # the -Generic suffix
 DeclareGlobalFunction("ClassicalMaximalsGeneric");
+
 #! @Arguments n, q
 #! @Description
 #! TODO

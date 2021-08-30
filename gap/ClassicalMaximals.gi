@@ -5,6 +5,10 @@
 #
 InstallGlobalFunction(ClassicalMaximalsGeneric,
 function(type, n, q)
-	return 0;
+    return 0;
 end);
 
+InstallGlobalFunction(MaximalSubgroupClassRepsSpecialLinearGroup,
+function(n, q)
+    return 0;
+end);
