@@ -21,7 +21,7 @@ local As, rootAs, Bs, Cs, Fs, m, gammaL1, Y, A, B, C, D, DBlock, ZBlock, i, rang
     Assert(1, n mod s = 0);
     Assert(1, IsPrime(s));
 
-    #Construction as in Proposition 6.3 of [2]
+    # Construction as in Proposition 6.3 of [2]
     m := QuoInt(n, s);
     gammaL1 := GammaLDimension1(s, q);
     As := gammaL1.1;
@@ -37,7 +37,9 @@ local As, rootAs, Bs, Cs, Fs, m, gammaL1, Y, A, B, C, D, DBlock, ZBlock, i, rang
         else
             # TODO
             # This is kind of a hack and is intended to cover the case n=q=s=2
-            # which is not treated in [2] at all; formerly, this case would
+            # which is not treated in [2] at all (technically, this combination
+            # of arguments will not be called by the ClassicalMaximals function
+            # as SL(2, 2) is soluble - but still!); formerly, this case would
             # just land in the previous elif block, but the quotient (q-1)/2
             # would not be an integer so this is nonsense -- this is a
             # workaround using the fact that for n=q=s=2 we have
