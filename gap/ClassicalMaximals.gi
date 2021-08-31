@@ -18,7 +18,7 @@ function(n, q)
     maximalSubgroups := [];
 
     if (n = 2 and q <= 3) then
-        Error("SL_2(2) and SL_2(3) are soluble")
+        Error("SL_2(2) and SL_2(3) are soluble");
     fi;
 
     # class C1 subgroups
