@@ -22,3 +22,5 @@ DeclareGlobalFunction("ClassicalMaximalsGeneric");
 #! @Description
 #! TODO
 DeclareGlobalFunction("MaximalSubgroupClassRepsSpecialLinearGroup");
+
+DeclareGlobalFunction("ConjugatesInGeneralGroup");

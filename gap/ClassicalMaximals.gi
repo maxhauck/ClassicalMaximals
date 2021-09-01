@@ -10,6 +10,12 @@
 #
 # Implementations
 #
+
+InstallGlobalFunction(ConjugatesInGeneralGroup,
+function(S, C, r)
+    return List([0..r - 1], i -> S ^ (C ^ i));
+end);
+
 InstallGlobalFunction(ClassicalMaximalsGeneric,
 function(type, n, q)
     if type = "L" then
@@ -21,12 +27,18 @@ end);
 
 InstallGlobalFunction(MaximalSubgroupClassRepsSpecialLinearGroup,
 function(n, q)
-    local maximalSubgroups, k, divisors, t, primeDivisors, s;
+    local maximalSubgroups, k, divisors, t, primeDivisorsOfn, primeDivisorsOfe, s, factorisation, p,
+    e, generatorGLMinusSL, degreeOfExtension, f, numberOfConjugates;
     maximalSubgroups := [];
 
     if (n = 2 and q <= 3) then
         Error("SL_2(2) and SL_2(3) are soluble");
     fi;
+
+    factorisation := PrimePowersInt(q);
+    p := factorisation[1];
+    e := factorisation[2];
+    generatorGLMinusSL := GL(n, q).1;
 
     # Class C1 subgroups
     for k in [1..n-1] do
@@ -55,10 +67,10 @@ function(n, q)
     od;
 
     # Class C3 subgroups
-    primeDivisors := PrimeDivisors(n);
-    for s in primeDivisors do
+    primeDivisorsOfn := PrimeDivisors(n);
+    for s in primeDivisorsOfn do
         if (n = 2 and q = 7) or (n = 3 and q = 4) then
-            break;
+            continue;
             # small exceptions
 
             # TODO
@@ -67,6 +79,20 @@ function(n, q)
             # --> talk this over with Sergio!!
         fi;
         Add(maximalSubgroups, GammaLMeetSL(n, q, s));
+    od;
+
+    # Class C5 subgroups
+    primeDivisorsOfe := PrimeDivisors(e);
+    for degreeOfExtension in primeDivisorsOfe do
+        f := QuoInt(e, degreeOfExtension);
+        if n = 2 and p = 2 and f = 1 then
+            continue;
+            # small exceptions
+        fi;
+        S := SubfieldSL(n, p, e, f);
+        numberOfConjugates := Gcd(d, QuoInt(q - 1, p ^ f - 1));
+        maximalSubgroups := Concatenation(maximalSubgroups,
+        ConjugatesInGeneralGroup(S, generatorGLMinusSL, numberOfConjugates));
     od;
 
     return maximalSubgroups;
