@@ -21,7 +21,7 @@ end);
 
 InstallGlobalFunction(MaximalSubgroupClassRepsSpecialLinearGroup,
 function(n, q)
-    local maximalSubgroups, k, divisors, t;
+    local maximalSubgroups, k, divisors, t, primeDivisors, s;
     maximalSubgroups := [];
 
     if (n = 2 and q <= 3) then
@@ -45,8 +45,28 @@ function(n, q)
         and t = 2 and q = 3) then
             continue;
             # more small exceptions
+
+            # TODO
+            # original Magma code also has an exception for n = 2 and q = 11,
+            # but this is not in [1]
+            # --> talk this over with Sergio!!
         fi;
         Add(maximalSubgroups, ImprimitivesMeetSL(n, q, t));
+    od;
+
+    # Class C3 subgroups
+    primeDivisors := PrimeDivisors(n);
+    for s in primeDivisors do
+        if (n = 2 and q = 7) or (n = 3 and q = 4) then
+            break;
+            # small exceptions
+
+            # TODO
+            # original Magma code also has an exception for n = 2 and q = 9,
+            # but this is not in [1]
+            # --> talk this over with Sergio!!
+        fi;
+        Add(maximalSubgroups, GammaLMeetSL(n, q, s));
     od;
 
     return maximalSubgroups;
