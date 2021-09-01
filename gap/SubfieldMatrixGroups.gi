@@ -13,12 +13,6 @@ local A, B, C, D, c, k, matrixForCongruence, lambda, zeta, omega, z, X;
     C := zeta ^ (QuoInt(p ^ e - 1, k)) * IdentityMat(n, GF(p ^ e));
 
     if c = Gcd(p ^ f - 1, n) then
-        # TODO
-        # This is not quite optimal as A and B are matrics over GF(p ^ f)
-        # whereas C is a matrix over GF(p ^ e); it does work and gives the
-        # correct result, but the generators of the group are not displayed
-        # properly - how to cast A and B as matrics over GF(p ^ e) instead?
-        # --> ask Sergio!!
         return Group(A, B, C);
     fi;
 
@@ -32,9 +26,6 @@ local A, B, C, D, c, k, matrixForCongruence, lambda, zeta, omega, z, X;
     lambda := SolutionMat(matrixForCongruence, [z])[1];
 
     X := zeta ^ (-lambda) * IdentityMat(n, GF(p ^ e));
-    # TODO
-    # Same thing as above 
-    # --> ask Sergio!!
     return Group(A, B, C, X * D);
 end);
 
