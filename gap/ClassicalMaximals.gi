@@ -28,7 +28,8 @@ end);
 InstallGlobalFunction(MaximalSubgroupClassRepsSpecialLinearGroup,
 function(n, q)
     local maximalSubgroups, k, divisors, t, primeDivisorsOfn, primeDivisorsOfe, s, factorisation, p,
-    e, generatorGLMinusSL, degreeOfExtension, f, numberOfConjugates;
+    e, generatorGLMinusSL, degreeOfExtension, f, numberOfConjugates,
+    subfieldGroup;
     maximalSubgroups := [];
 
     if (n = 2 and q <= 3) then
@@ -89,10 +90,10 @@ function(n, q)
             continue;
             # small exceptions
         fi;
-        S := SubfieldSL(n, p, e, f);
-        numberOfConjugates := Gcd(d, QuoInt(q - 1, p ^ f - 1));
+        subfieldGroup := SubfieldSL(n, p, e, f);
+        numberOfConjugates := Gcd(n, QuoInt(q - 1, p ^ f - 1));
         maximalSubgroups := Concatenation(maximalSubgroups,
-        ConjugatesInGeneralGroup(S, generatorGLMinusSL, numberOfConjugates));
+        ConjugatesInGeneralGroup(subfieldGroup, generatorGLMinusSL, numberOfConjugates));
     od;
 
     return maximalSubgroups;

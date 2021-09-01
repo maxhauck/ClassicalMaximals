@@ -1,6 +1,6 @@
 InstallGlobalFunction(ImprimitivesMeetSL, 
 function(n, q, t)
-local det, E, gens, i, newGen, newGens, wreathProduct, z, m;
+local det, E, gens, i, newGen, newGens, wreathProduct, z, m, subgroup;
     Assert(1, (n mod t) = 0);
     Assert(1, t > 1);
     m := QuoInt(n, t);
@@ -23,5 +23,7 @@ local det, E, gens, i, newGen, newGens, wreathProduct, z, m;
     E := DiagonalMat(Concatenation([z], List([2..m], i -> z ^ 0), 
            [z ^ -1], List([m + 2..n], i -> z ^ 0)));
     Add(newGens, E);
-    return Group(newGens);
+    subgroup := Group(newGens);
+    SetSize(subgroup, Size(SL(n/t, q))^t*(q-1)^(t-1)*Factorial(t));
+    return subgroup;
 end);

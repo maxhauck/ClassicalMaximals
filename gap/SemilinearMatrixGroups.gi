@@ -1,6 +1,6 @@
 InstallGlobalFunction(GammaLDimension1, 
 function(s, q)
-local A, B, primitivePolynomial, x, xq;
+local A, B, primitivePolynomial, x, xq, subgroup;
     # Construction as in Lemma 6.1 of [2]
     primitivePolynomial := MinimalPolynomial(GF(q), Z(q ^ s));
     x := IndeterminateOfUnivariateRationalFunction(primitivePolynomial);
@@ -12,12 +12,15 @@ local A, B, primitivePolynomial, x, xq;
     # s coefficients, the summand x ^ s we "tweaked in" will then be neglected
     B := List([0..s - 1], i -> CoefficientsOfUnivariatePolynomial(x ^ s +
           (PowerMod(xq, i, primitivePolynomial))){[1..s]});
-    return Group(A, B);
+    subgroup := Group(A, B);
+    SetSize(subgroup, Size(GammaL(1, q ^ s)));
+    return subgroup;
 end);
 
 InstallGlobalFunction(GammaLMeetSL,
 function(n, q, s)
-local As, rootAs, Bs, Cs, Fs, m, gammaL1, Y, A, B, C, D, DBlock, ZBlock, i, range;
+local As, rootAs, Bs, Cs, Fs, m, gammaL1, Y, A, B, C, D, DBlock, ZBlock, i,
+range, subgroup;
     Assert(1, n mod s = 0);
     Assert(1, IsPrime(s));
 
@@ -30,10 +33,14 @@ local As, rootAs, Bs, Cs, Fs, m, gammaL1, Y, A, B, C, D, DBlock, ZBlock, i, rang
 
     if m = 1 then
         if n mod 2 = 1 then
-            return Group(Bs, Cs);
+            subgroup := Group(Bs, Cs);
+            SetSize(subgroup, Size(SL(n / s, q ^ s)) * (q ^ s - 1) / (q - 1) * s);
+            return subgroup;
         elif q mod 2 = 1 then
             Fs := (As ^ QuoInt(q - 1, 2)) * Bs;
-            return Group(Cs, Fs);
+            subgroup := Group(Cs, Fs);
+            SetSize(subgroup, Size(SL(n / s, q ^ s)) * (q ^ s - 1) / (q - 1) * s);
+            return subgroup;
         else
             # TODO
             # This is kind of a hack and is intended to cover the case n=q=s=2
@@ -49,7 +56,9 @@ local As, rootAs, Bs, Cs, Fs, m, gammaL1, Y, A, B, C, D, DBlock, ZBlock, i, rang
             # --> talk this over with Sergio!!
             rootAs := Z(2) * [[1, 1], [1, 0]];
             Fs := rootAs * Bs;
-            return Group(Cs, Fs);
+            subgroup := Group(Cs, Fs);
+            SetSize(subgroup, Size(SL(n / s, q ^ s)) * (q ^ s - 1) / (q - 1) * s);
+            return subgroup;
         fi;
     fi;
 
@@ -72,5 +81,7 @@ local As, rootAs, Bs, Cs, Fs, m, gammaL1, Y, A, B, C, D, DBlock, ZBlock, i, rang
         D{range}{range} := DBlock;
     od;
 
-    return Group(A, B, C, D);
+    subgroup := Group(A, B, C, D);
+    SetSize(subgroup, Size(SL(n / s, q ^ s)) * (q ^ s - 1) / (q - 1) * s);
+    return subgroup;
 end);
