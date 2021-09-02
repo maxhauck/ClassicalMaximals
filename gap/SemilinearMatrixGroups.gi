@@ -1,27 +1,27 @@
 # Construction as in Lemma 6.1 of [2]
-InstallGlobalFunction(GammaLDimension1,
+InstallGlobalFunction(CLASSICALMAXIMALS_GammaLDimension1,
 function(s, q)
-    local A, B, primitivePolynomial, x, xq, result;
+    local A, B, primitivePolynomial, x, xq;
+    # Let w be a primitive element of GF(q ^ s) over GF(q).
+    # A acts on the standard basis in the same way as w acts by multiplication
+    # on the GF(q)-basis {1, w, w ^ 2, ...} of GF(q ^ s).
     primitivePolynomial := MinimalPolynomial(GF(q), Z(q ^ s));
-    # A acts on the natural basis in the same way as w acts by multiplication
-    # on the basis {1, w, w ^ 2, ...} of GF(q ^ s) over GF(q), where w is a
-    # primitive element of GF(q ^ s) over GF(q).
     A := TransposedMat(CompanionMat(primitivePolynomial));
-    # B acts on the natural basis in the same way as the Frobenius acts on the
+    # B acts on the standard basis in the same way as the Frobenius acts on the
     # basis {1, w, w ^ 2, ...} of GF(q ^ s) over GF(q), where w is as above.
-    #
-    # Adding x ^ s in the following construction is a bit of a hack: this
-    # ensures that the polynomials from which we extract the coefficients have
-    # all degree >= s - 1 so that none of the entries of the matrix B will be
-    # empty; by only taking the first s coefficients, the summand x ^ s we
-    # "tweaked in" will then be neglected.
     x := IndeterminateOfUnivariateRationalFunction(primitivePolynomial);
     xq := PowerMod(x, q, primitivePolynomial);
-    B := List([0..s - 1], i -> CoefficientsOfUnivariatePolynomial(x ^ s +
-          (PowerMod(xq, i, primitivePolynomial))){[1..s]});
-    result := Group(A, B);
-    SetSize(result, Size(GammaL(1, q ^ s)));
-    return result;
+    B := [];
+    for i in [0 .. s - 1] do
+        row := CoefficientsOfUnivariatePolynomial(PowerMod(xq,
+                                                           i,
+                                                           primitivePolynomial));
+        row := Concatenation(row,
+                             ListWithIdenticalEntries(s - Length(row),
+                                                      Zero(GF(q))));
+        Add(B, row);
+    od;
+    return rec(A := A, B := B);
 end);
 
 # Construction as in Proposition 6.3 of [2]
@@ -29,15 +29,15 @@ InstallGlobalFunction(GammaLMeetSL,
 function(n, q, s)
     local As, rootAs, Bs, Cs, Fs, m, gammaL1, Y, A, B, C, D, DBlock, ZBlock, i,
     range, result;
-    Assert(1, n mod s = 0);
-    Assert(1, IsPrime(s));
-
-    m := QuoInt(n, s);
-    gammaL1 := GammaLDimension1(s, q);
-    As := gammaL1.1;
-    Bs := gammaL1.2;
+    if n mod s <> 0 or not IsPrime(s) then
+        ErrorNoReturn("<s> must be prime and a divisor of <n> but <s> = ", s,
+                      "<n> = ", n);
+    fi;
+    gammaL1 := CLASSICALMAXIMALS_GammaLDimension1(s, q);
+    As := gammaL1.A;
+    Bs := gammaL1.B;
     Cs := As ^ (q - 1);
-
+    m := QuoInt(n, s);
     if m = 1 then
         if n mod 2 = 1 then
             result := Group(Bs, Cs);
