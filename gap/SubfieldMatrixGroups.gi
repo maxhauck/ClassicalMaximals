@@ -10,8 +10,10 @@ InstallGlobalFunction(SubfieldSL,
 function(n, p, e, f)
     local A, B, C, D, c, k, matrixForCongruence, lambda, zeta, omega, z, X,
         result;
-    Assert(1, e mod f = 0);
-    Assert(1, IsPrimeInt(QuoInt(e, f)));
+    if e mod f <> 0 or not IsPrimeInt(QuoInt(e, f)) then
+        ErrorNoReturn("<f> must be a divisor of <e> and their quotient must be
+                      a prime but <e> = ", e, "<f> = ", f);
+    fi;
 
     A := SL(n, p ^ f).1;
     B := SL(n, p ^ f).2;

@@ -7,8 +7,10 @@
 BindGlobal("ImprimitivesMeetSL", 
 function(n, q, t)
     local det, E, gens, i, newGen, newGens, wreathProduct, z, m, result;
-    Assert(1, (n mod t) = 0);
-    Assert(1, t > 1);
+    if t = 1 or (n mod t) <> 0 then
+        ErrorNoReturn("<t> must be greater than 1 and a divisor of <n> but <t> = ", t,
+                      "<n> = ", n);
+    fi;
     m := QuoInt(n, t);
     wreathProduct := MatWreathProduct(SL(m, q), SymmetricGroup(t));
     gens := GeneratorsOfGroup(wreathProduct);
