@@ -1,7 +1,7 @@
 InstallGlobalFunction(SubfieldSL, 
 function(n, p, e, f)
-local A, B, C, D, c, k, matrixForCongruence, lambda, zeta, omega, z, X,
-result;
+    local A, B, C, D, c, k, matrixForCongruence, lambda, zeta, omega, z, X,
+        result;
     Assert(1, e mod f = 0);
     Assert(1, IsPrimeInt(QuoInt(e, f)));
 
