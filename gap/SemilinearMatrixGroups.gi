@@ -4,12 +4,19 @@ local A, B, primitivePolynomial, x, xq, result;
     # Construction as in Lemma 6.1 of [2]
     primitivePolynomial := MinimalPolynomial(GF(q), Z(q ^ s));
     x := IndeterminateOfUnivariateRationalFunction(primitivePolynomial);
+    # A acts on the natural basis in the same way as w acts by multiplication
+    # on the basis {1, w, w ^ 2, ...} of GF(q ^ s) over GF(q), where w is a
+    # primitive element of GF(q ^ s) over GF(q).
     A := TransposedMat(CompanionMat(primitivePolynomial));
     xq := PowerMod(x, q, primitivePolynomial);
-    # Adding x ^ s here is a bit of a "hack": this ensures that the polynomials
-    # from which we extract the coefficients have all degree >= s - 1 so that
-    # none of the entries of the matrix B will be empty; by only taking the first
-    # s coefficients, the summand x ^ s we "tweaked in" will then be neglected
+    # B acts on the natural basis in the same way as the Frobenius acts on the
+    # basis {1, w, w ^ 2, ...} of GF(q ^ s) over GF(q), where w is as above.
+    #
+    # Adding x ^ s in the following construction is a bit of a hack: this
+    # ensures that the polynomials from which we extract the coefficients have
+    # all degree >= s - 1 so that none of the entries of the matrix B will be
+    # empty; by only taking the first s coefficients, the summand x ^ s we
+    # "tweaked in" will then be neglected.
     B := List([0..s - 1], i -> CoefficientsOfUnivariatePolynomial(x ^ s +
           (PowerMod(xq, i, primitivePolynomial))){[1..s]});
     result := Group(A, B);
@@ -19,8 +26,8 @@ end);
 
 InstallGlobalFunction(GammaLMeetSL,
 function(n, q, s)
-local As, rootAs, Bs, Cs, Fs, m, gammaL1, Y, A, B, C, D, DBlock, ZBlock, i,
-range, result;
+    local As, rootAs, Bs, Cs, Fs, m, gammaL1, Y, A, B, C, D, DBlock, ZBlock, i,
+    range, result;
     Assert(1, n mod s = 0);
     Assert(1, IsPrime(s));
 
