@@ -51,21 +51,10 @@ function(n, q, s)
             Fs := (As ^ QuoInt(q - 1, 2)) * Bs;
             result := Group(Cs, Fs);
         else
-            # TODO
-            # This is kind of a hack and is intended to cover the case n=q=s=2
-            # which is not treated in [2] at all (technically, this combination
-            # of arguments will not be called by the ClassicalMaximals function
-            # as SL(2, 2) is soluble - but still!); formerly, this case would
-            # just land in the previous elif block, but the quotient (q-1)/2
-            # would not be an integer so this is nonsense -- this is a
-            # workaround using the fact that for n=q=s=2 we have
-            # [[1, 1], [1, 0]]^2 = As so this matrix is some sort of "root" of
-            # As; making this choice seems to give the correct results since it
-            # produces a group of order 6, as expected
-            # --> talk this over with Sergio!!
-            rootAs := Z(2) * [[1, 1], [1, 0]];
-            Fs := rootAs * Bs;
-            result := Group(Cs, Fs);
+            # Although det(Bs) = -1 in the present case of s = 2, this is not a
+            # problem since, in this case we have q mod 2 = 1 and so the field
+            # GF(q) has characteristic 2, i.e. -1 = 1 and det(Bs) = 1.
+            result := Group(Bs, Cs);
         fi;
         SetSize(result, Size(SL(n / s, q ^ s)) * (q ^ s - 1) / (q - 1) * s);
         return result;
@@ -79,6 +68,7 @@ function(n, q, s)
     C := IdentityMat(n, GF(q));
     C{[1..s]}{[1..s]} := Cs;
     D := IdentityMat(n, GF(q));
+    # As above, the case q even is trivial.
     if s = 2 and IsOddInt(m) and IsOddInt(q) then
         ZBlock := As ^ QuoInt(q - 1, 2);
         DBlock := ZBlock * Bs;
