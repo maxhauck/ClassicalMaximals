@@ -1,7 +1,7 @@
 # Construction as in Lemma 6.1 of [2]
 BindGlobal("CLASSICALMAXIMALS_GammaLDimension1",
 function(s, q)
-    local A, B, primitivePolynomial, x, xq;
+    local primitivePolynomial, A, x, xq, B, row, i;
     # Let w be a primitive element of GF(q ^ s) over GF(q).
     # A acts on the standard basis in the same way as w acts by multiplication
     # on the GF(q)-basis {1, w, w ^ 2, ...} of GF(q ^ s).
