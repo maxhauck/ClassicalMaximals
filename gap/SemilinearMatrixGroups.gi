@@ -1,14 +1,12 @@
 # Construction as in Lemma 6.1 of [2]
-InstallGlobalFunction(GammaLDimension1, 
+InstallGlobalFunction(GammaLDimension1,
 function(s, q)
     local A, B, primitivePolynomial, x, xq, result;
     primitivePolynomial := MinimalPolynomial(GF(q), Z(q ^ s));
-    x := IndeterminateOfUnivariateRationalFunction(primitivePolynomial);
     # A acts on the natural basis in the same way as w acts by multiplication
     # on the basis {1, w, w ^ 2, ...} of GF(q ^ s) over GF(q), where w is a
     # primitive element of GF(q ^ s) over GF(q).
     A := TransposedMat(CompanionMat(primitivePolynomial));
-    xq := PowerMod(x, q, primitivePolynomial);
     # B acts on the natural basis in the same way as the Frobenius acts on the
     # basis {1, w, w ^ 2, ...} of GF(q ^ s) over GF(q), where w is as above.
     #
@@ -17,6 +15,8 @@ function(s, q)
     # all degree >= s - 1 so that none of the entries of the matrix B will be
     # empty; by only taking the first s coefficients, the summand x ^ s we
     # "tweaked in" will then be neglected.
+    x := IndeterminateOfUnivariateRationalFunction(primitivePolynomial);
+    xq := PowerMod(x, q, primitivePolynomial);
     B := List([0..s - 1], i -> CoefficientsOfUnivariatePolynomial(x ^ s +
           (PowerMod(xq, i, primitivePolynomial))){[1..s]});
     result := Group(A, B);
