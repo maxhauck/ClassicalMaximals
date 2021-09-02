@@ -63,13 +63,14 @@ function(n, q, s)
 
     A := IdentityMat(n, GF(q));
     A{[1..s]}{[1..s]} := As;
+    A{[1..s]}{[1..s]} := As;
     A{[s + 1..2 * s]}{[s + 1..2 * s]} := As ^ -1;
     Y := SL(m, q ^ s).2;
     B := KroneckerProduct(Y, IdentityMat(s, GF(q)));
     C := IdentityMat(n, GF(q));
     C{[1..s]}{[1..s]} := Cs;
     D := IdentityMat(n, GF(q));
-    # As above, the case q even is trivial.
+    # The determinant of D might be -1. In these cases, adjust D.
     if s = 2 and IsOddInt(m) and IsOddInt(q) then
         ZBlock := As ^ QuoInt(q - 1, 2);
         DBlock := ZBlock * Bs;
