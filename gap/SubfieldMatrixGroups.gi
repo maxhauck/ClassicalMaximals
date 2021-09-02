@@ -1,7 +1,7 @@
 InstallGlobalFunction(SubfieldSL, 
 function(n, p, e, f)
 local A, B, C, D, c, k, matrixForCongruence, lambda, zeta, omega, z, X,
-subgroup;
+result;
     Assert(1, e mod f = 0);
     Assert(1, IsPrimeInt(QuoInt(e, f)));
 
@@ -14,10 +14,10 @@ subgroup;
     C := zeta ^ (QuoInt(p ^ e - 1, k)) * IdentityMat(n, GF(p ^ e));
 
     if c = Gcd(p ^ f - 1, n) then
-        subgroup := Group(A, B, C);
-        SetSize(subgroup, Size(SL(n, p ^ f)) * Gcd(QuoInt(p ^ e - 1, p ^ f -
+        result := Group(A, B, C);
+        SetSize(result, Size(SL(n, p ^ f)) * Gcd(QuoInt(p ^ e - 1, p ^ f -
         1), n));
-        return subgroup;
+        return result;
     fi;
 
     omega := zeta ^ QuoInt(p ^ e - 1, p ^ f - 1);
@@ -30,9 +30,9 @@ subgroup;
     lambda := SolutionMat(matrixForCongruence, [z])[1];
 
     X := zeta ^ (-lambda) * IdentityMat(n, GF(p ^ e));
-    subgroup := Group(A, B, C, X * D);
-    SetSize(subgroup, Size(SL(n, p ^ f)) * Gcd(QuoInt(p ^ e - 1, p ^ f - 1),
+    result := Group(A, B, C, X * D);
+    SetSize(result, Size(SL(n, p ^ f)) * Gcd(QuoInt(p ^ e - 1, p ^ f - 1),
     n)); 
-    return subgroup;
+    return result;
 end);
 
