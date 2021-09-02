@@ -36,18 +36,20 @@ function(n, q, s)
     gammaL1 := CLASSICALMAXIMALS_GammaLDimension1(s, q);
     As := gammaL1.A;
     Bs := gammaL1.B;
+    # Let w be a primitive element of GF(q ^ s) over GF(q). Since As is the
+    # companion matrix of the minimal polynomial of w over GF(q), its
+    # determinant is (-1) ^ s times the constant term of said minimal
+    # polynomial. By Vieta, this constant term is (-1) ^ s * the product of 
+    # all Galois conjugates of w. Hence, det(As) = w ^ ((q ^ s - 1) / (q - 1)).
+    # Now det(Cs) = det(As) ^ (q - 1) = w ^ (q ^ s - 1) = 1.
     Cs := As ^ (q - 1);
     m := QuoInt(n, s);
     if m = 1 then
         if n mod 2 = 1 then
             result := Group(Bs, Cs);
-            SetSize(result, Size(SL(n / s, q ^ s)) * (q ^ s - 1) / (q - 1) * s);
-            return result;
         elif q mod 2 = 1 then
             Fs := (As ^ QuoInt(q - 1, 2)) * Bs;
             result := Group(Cs, Fs);
-            SetSize(result, Size(SL(n / s, q ^ s)) * (q ^ s - 1) / (q - 1) * s);
-            return result;
         else
             # TODO
             # This is kind of a hack and is intended to cover the case n=q=s=2
@@ -64,9 +66,9 @@ function(n, q, s)
             rootAs := Z(2) * [[1, 1], [1, 0]];
             Fs := rootAs * Bs;
             result := Group(Cs, Fs);
-            SetSize(result, Size(SL(n / s, q ^ s)) * (q ^ s - 1) / (q - 1) * s);
-            return result;
         fi;
+        SetSize(result, Size(SL(n / s, q ^ s)) * (q ^ s - 1) / (q - 1) * s);
+        return result;
     fi;
 
     A := IdentityMat(n, GF(q));

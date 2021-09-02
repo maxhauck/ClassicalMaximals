@@ -1,6 +1,5 @@
 OddExtraspecialGroup := function(r, m, q)
-    local zeta, omega, X, Y, permutationMatrixEntries, listOfXi, listOfYi,
-    generators, result;
+    local zeta, omega, X, Y, permutationMatrixEntries, listOfXi, listOfYi;
     Assert(1, r mod 2 = 1);
     Assert(1, (q - 1) mod r = 0); 
     # Construction as in Lemma 9.1 of [2]
@@ -17,16 +16,13 @@ OddExtraspecialGroup := function(r, m, q)
     listOfYi := List([1..m], i ->
     KroneckerProduct(KroneckerProduct(IdentityMat(r ^ (m - i), GF(q)), Y),
     IdentityMat(r ^ (i - 1), GF(q))));
-    generators := Concatenation(listOfXi, listOfYi);
 
-    result := GroupWithGenerators(generators);
-    SetSize(result, r ^ (1 + 2 * m));
-    return result;
+    return rec(listOfXi := listOfXi, listOfYi := listOfYi);
 end;
 
 OddExtraspecialNormalizer := function(r, m, q)
     local zeta, omega, U, V, W, listOfUi, listOfVi, listOfWi, matrixIndices,
-    entriesOfV, w, generatingScalar, generators, result;
+    entriesOfV, w, generatingScalar, result;
     # Construction as in Lemma 9.2 of [2]
     zeta := PrimitiveElement(GF(q));
     omega := zeta ^ (QuoInt(q - 1, r));
@@ -52,9 +48,11 @@ OddExtraspecialNormalizer := function(r, m, q)
     IdentityMat(r ^ (i - 1), GF(q))));
 
     generatingScalar := zeta * IdentityMat(r ^ m, GF(q));
-    generators := Concatenation([generatingScalar],
-    GeneratorsOfGroup(OddExtraspecialGroup), listOfUi, listOfVi, listOfWi);
-    result := GroupWithGenerators(generators);
+    result := OddExtraspecialGroup;
+    result.generatingScalar := generatingScalar;
+    result.listOfUi := listOfUi;
+    result.listOfVi := listOfVi;
+    result.listOfWi := listOfWi;
     # TODO
     # I would set the size of the group here, but to which value??
     return result;
@@ -67,14 +65,13 @@ function(r, m, q)
     scalarMultiplierWi, generators, generatingScalar;
     # Construction as in Proposition 9.5 of [2]
     if r mod 2 = 1 then
-        generatorsOfNormalizerInGL :=
-        GeneratorsOfGroup(OddExtraspecialNormalizer(r, m, q));
+        generatorsOfNormalizerInGL := OddExtraspecialNormalizer(r, m, q);
         # These are the Xi and Yi
-        generatorsOfExtraspecialGroup := generatorsOfNormalizerInGL[{2..2 * m +
-        1}];
-        listOfUi := generatorsOfNormalizerInGL[{2 * m + 2..3 * m + 1}];
-        listOfVi := generatorsOfNormalizerInGL[{3 * m + 2..4 * m + 1}];
-        listOfWi := generatorsOfNormalizerInGL[{4 * m + 2..5 * m}];
+        generatorsOfExtraspecialGroup := Concatenation(generatorsOfNormalizerInGL.listOfXi,
+                                                       generatorsOfNormalizerInGL.listOfYi);
+        listOfUi := generatorsOfNormalizerInGL.listOfUi;
+        listOfVi := generatorsOfNormalizerInGL.listOfVi;
+        listOfWi := generatorsOfNormalizerInGL.listOfWi;
 
         if r ^ m <> 3 then
             # Let G denote the normalizer of the extraspecial group r ^ (1 + 2 * m)
@@ -102,7 +99,9 @@ function(r, m, q)
             generatingScalar := zeta ^ (QuoInt(q - 1, Gcd(q - 1, r ^ m))) *
             IdentityMat(r ^ m, GF(q));
 
-            generators := Concatenation
+            generators := Concatenation([generatingScalar],
+                                        generatorsOfExtraspecialGroup, 
+                                        listOfUi, listOfVi, listOfWi);
         fi;
     fi;
 end);
