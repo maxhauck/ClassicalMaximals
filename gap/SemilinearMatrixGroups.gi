@@ -1,4 +1,4 @@
-# Construction as in Lemma 6.1 of [2]
+    # Construction as in Lemma 6.1 of [2]
 InstallGlobalFunction(GammaLDimension1,
 function(s, q)
     local A, B, primitivePolynomial, x, xq, result;
