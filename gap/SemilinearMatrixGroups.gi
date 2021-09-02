@@ -1,6 +1,6 @@
 InstallGlobalFunction(GammaLDimension1, 
 function(s, q)
-local A, B, primitivePolynomial, x, xq, result;
+    local A, B, primitivePolynomial, x, xq, result;
     # Construction as in Lemma 6.1 of [2]
     primitivePolynomial := MinimalPolynomial(GF(q), Z(q ^ s));
     x := IndeterminateOfUnivariateRationalFunction(primitivePolynomial);
