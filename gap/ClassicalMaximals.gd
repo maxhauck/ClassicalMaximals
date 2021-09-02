@@ -23,4 +23,3 @@ DeclareGlobalFunction("ClassicalMaximalsGeneric");
 #! TODO
 DeclareGlobalFunction("MaximalSubgroupClassRepsSpecialLinearGroup");
 
-DeclareGlobalFunction("ConjugatesInGeneralGroup");

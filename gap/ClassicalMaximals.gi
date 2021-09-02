@@ -11,10 +11,9 @@
 # Implementations
 #
 
-InstallGlobalFunction(ConjugatesInGeneralGroup,
-function(S, C, r)
+ConjugatesInGeneralGroup := function(S, C, r)
     return List([0..r - 1], i -> S ^ (C ^ i));
-end);
+end;
 
 InstallGlobalFunction(ClassicalMaximalsGeneric,
 function(type, n, q)
