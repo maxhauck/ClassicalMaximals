@@ -53,12 +53,10 @@ OddExtraspecialNormalizer := function(r, m, q)
     result.listOfUi := listOfUi;
     result.listOfVi := listOfVi;
     result.listOfWi := listOfWi;
-    # TODO
-    # I would set the size of the group here, but to which value??
     return result;
 end;
 
-InstallGlobalFunction("ExtraspecialNormalizerMeetSL"
+InstallGlobalFunction(ExtraspecialNormalizerMeetSL,
 function(r, m, q)
     local listOfUi, listOfVi, listOfWi, generatorsOfNormalizerInGL,
     generatorsOfExtraspecialGroup, scalarMultiplierUi, scalarMultiplierVi,
