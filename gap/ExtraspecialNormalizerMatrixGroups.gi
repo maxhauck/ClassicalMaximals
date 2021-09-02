@@ -40,6 +40,10 @@ OddExtraspecialNormalizer := function(r, m, q)
     KroneckerProduct(KroneckerProduct(IdentityMat(r ^ (m - i), GF(q)), V),
     IdentityMat(r ^ (i - 1), GF(q))));
 
+    # TODO TODO TODO
+    # Careful here!!! What if m = 1, i.e. q = r?? W is an r ^ 2 by r ^ 2 matrix
+    # - do we just not consider W in that case??
+    # TODO TODO TODO
     w := PermList(List([1..r ^ 2 - 1], a -> (a + ((a - 1) mod r) * r) mod r ^
     2));
     W := PermutationMat(w);
@@ -56,12 +60,23 @@ OddExtraspecialNormalizer := function(r, m, q)
     return result;
 end;
 
+ScalarToNormalizeDeterminant := function(matrix, sizeOfMatrix, field)
+    local scalar;
+    scalar := RootFFE(field, Determinant(matrix), sizeOfMatrix);
+    if scalar = fail then
+        return fail;
+    else
+        return scalar ^ -1;
+    fi;
+end;
+
 InstallGlobalFunction(ExtraspecialNormalizerMeetSL,
 function(r, m, q)
-    local listOfUi, listOfVi, listOfWi, generatorsOfNormalizerInGL,
+    local d, listOfUi, listOfVi, listOfWi, generatorsOfNormalizerInGL,
     generatorsOfExtraspecialGroup, scalarMultiplierUi, scalarMultiplierVi,
     scalarMultiplierWi, generators, generatingScalar;
     # Construction as in Proposition 9.5 of [2]
+    d := r ^ m
     if r mod 2 = 1 then
         generatorsOfNormalizerInGL := OddExtraspecialNormalizer(r, m, q);
         # These are the Xi and Yi
@@ -71,7 +86,7 @@ function(r, m, q)
         listOfVi := generatorsOfNormalizerInGL.listOfVi;
         listOfWi := generatorsOfNormalizerInGL.listOfWi;
 
-        if r ^ m <> 3 then
+        if d <> 3 then
             # Let G denote the normalizer of the extraspecial group r ^ (1 + 2 * m)
             # in GL(d, q), where d = r ^ m. Then, according to the proof of
             # Proposition 9.5 of [2], we have G = (G intersect SL(d, q))Z(G) in
@@ -83,12 +98,14 @@ function(r, m, q)
             # construction, det(Ui), det(Vi) and det(Wi) are independent of i
             # so that, in fact, we only have to compute three dth roots in
             # GF(q) (that is, the dth roots of det(U1), det(V1) and det(W1)).
-            scalarMultiplierUi := RootFFE(GF(q), Determinant(listOfUi[1]), d) ^
-            -1; 
-            scalarMultiplierVi := RootFFE(GF(q), Determinant(listOfVi[1]), d) ^
-            -1;
-            scalarMultiplierWi := RootFFE(GF(q), Determinant(listOfWi[1]), d) ^
-            -1;
+
+            scalarMultiplierUi := ScalarToNormalizeDeterminant(listOfUi[1], 
+                                                               d, GF(q));
+            scalarMultiplierVi := ScalarToNormalizeDeterminant(listOfVi[1], 
+                                                               d, GF(q));
+            scalarMultiplierWi := ScalarToNormalizeDeterminant(listOfWi[1], 
+                                                               d, GF(q));
+
             listOfUi := List(listOfUi, Ui -> scalarMultiplierUi * Ui);
             listOfVi := List(listOfVi, Vi -> scalarMultiplierVi * Vi);
             listOfWi := List(listOfWi, Wi -> scalarMultiplierWi * Wi);
@@ -100,6 +117,8 @@ function(r, m, q)
             generators := Concatenation([generatingScalar],
                                         generatorsOfExtraspecialGroup, 
                                         listOfUi, listOfVi, listOfWi);
+        else
+            
         fi;
     fi;
 end);
