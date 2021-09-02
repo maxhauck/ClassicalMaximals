@@ -1,5 +1,5 @@
 # Construction as in Lemma 6.1 of [2]
-InstallGlobalFunction(CLASSICALMAXIMALS_GammaLDimension1,
+BindGlobal("CLASSICALMAXIMALS_GammaLDimension1",
 function(s, q)
     local A, B, primitivePolynomial, x, xq;
     # Let w be a primitive element of GF(q ^ s) over GF(q).

@@ -7,6 +7,7 @@
 #! over the field <C>F' := GF(q ^ s)</C>. See <Ref Func="GammaLMeetSL"/> for
 #! further details.
 DeclareGlobalFunction("GammaLDimension1");
+
 #! @Chapter Utility Functions
 #! @Section Maximal Subgroups
 #! @Arguments n, q, s
