@@ -4,7 +4,8 @@ function(s, q)
     local primitivePolynomial, A, x, xq, B, row, i;
     # Let w be a primitive element of GF(q ^ s) over GF(q).
     # A acts on the standard basis in the same way as w acts by multiplication
-    # on the GF(q)-basis {1, w, w ^ 2, ...} of GF(q ^ s).
+    # on the GF(q)-basis {1, w, w ^ 2, ...} of GF(q ^ s). (Note that A is a
+    # Singer cycle, i.e. has order q ^ s - 1.)
     primitivePolynomial := MinimalPolynomial(GF(q), Z(q ^ s));
     A := TransposedMat(CompanionMat(primitivePolynomial));
     # B acts on the standard basis in the same way as the Frobenius acts on the
