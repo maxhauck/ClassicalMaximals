@@ -34,14 +34,15 @@ function(n, q, s)
                       "<n> = ", n);
     fi;
     gammaL1 := CLASSICALMAXIMALS_GammaLDimension1(s, q);
-    As := gammaL1.A;
-    Bs := gammaL1.B;
     # Let w be a primitive element of GF(q ^ s) over GF(q). Since As is the
     # companion matrix of the minimal polynomial of w over GF(q), its
     # determinant is (-1) ^ s times the constant term of said minimal
-    # polynomial. By Vieta, this constant term is (-1) ^ s * the product of 
+    # polynomial. By Vieta, this constant term is (-1) ^ s * the product of
     # all Galois conjugates of w. Hence, det(As) = w ^ ((q ^ s - 1) / (q - 1)).
-    # Now det(Cs) = det(As) ^ (q - 1) = w ^ (q ^ s - 1) = 1.
+    As := gammaL1.A;
+    # By Lemma 6.2 det(Bs) = (-1) ^ (s - 1).
+    Bs := gammaL1.B;
+    # det(Cs) = det(As) ^ (q - 1) = w ^ (q ^ s - 1) = 1.
     Cs := As ^ (q - 1);
     m := QuoInt(n, s);
     if m = 1 then
@@ -50,10 +51,9 @@ function(n, q, s)
         elif q mod 2 = 1 then
             Fs := (As ^ QuoInt(q - 1, 2)) * Bs;
             result := Group(Cs, Fs);
+        # n = s = 2 and q even
         else
-            # Although det(Bs) = -1 in the present case of s = 2, this is not a
-            # problem since, in this case we have q mod 2 = 1 and so the field
-            # GF(q) has characteristic 2, i.e. -1 = 1 and det(Bs) = 1.
+            # In characteristic 2 we have det(Bs) = -1 = 1.
             result := Group(Bs, Cs);
         fi;
         SetSize(result, Size(SL(n / s, q ^ s)) * (q ^ s - 1) / (q - 1) * s);
