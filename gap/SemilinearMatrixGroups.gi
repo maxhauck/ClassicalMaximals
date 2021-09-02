@@ -1,7 +1,7 @@
+# Construction as in Lemma 6.1 of [2]
 InstallGlobalFunction(GammaLDimension1, 
 function(s, q)
     local A, B, primitivePolynomial, x, xq, result;
-    # Construction as in Lemma 6.1 of [2]
     primitivePolynomial := MinimalPolynomial(GF(q), Z(q ^ s));
     x := IndeterminateOfUnivariateRationalFunction(primitivePolynomial);
     # A acts on the natural basis in the same way as w acts by multiplication
@@ -24,6 +24,7 @@ function(s, q)
     return result;
 end);
 
+# Construction as in Proposition 6.3 of [2]
 InstallGlobalFunction(GammaLMeetSL,
 function(n, q, s)
     local As, rootAs, Bs, Cs, Fs, m, gammaL1, Y, A, B, C, D, DBlock, ZBlock, i,
@@ -31,7 +32,6 @@ function(n, q, s)
     Assert(1, n mod s = 0);
     Assert(1, IsPrime(s));
 
-    # Construction as in Proposition 6.3 of [2]
     m := QuoInt(n, s);
     gammaL1 := GammaLDimension1(s, q);
     As := gammaL1.1;
