@@ -40,16 +40,18 @@ OddExtraspecialNormalizer := function(r, m, q)
     KroneckerProduct(KroneckerProduct(IdentityMat(r ^ (m - i), GF(q)), V),
     IdentityMat(r ^ (i - 1), GF(q))));
 
-    # TODO TODO TODO
-    # Careful here!!! What if m = 1, i.e. q = r?? W is an r ^ 2 by r ^ 2 matrix
-    # - do we just not consider W in that case??
-    # TODO TODO TODO
-    w := PermList(List([1..r ^ 2 - 1], a -> (a + ((a - 1) mod r) * r) mod r ^
-    2));
-    W := PermutationMat(w);
-    listOfWi := List([1..m - 1], i ->
-    KroneckerProduct(KroneckerProduct(IdentityMat(r ^ (m - 1 - i), GF(q)), W),
-    IdentityMat(r ^ (i - 1), GF(q))));
+    if m <> 1 then
+        # If m = 1 then we cannot have the Wi as generators since W is in 
+        # GL(r ^ 2, q) (i.e. too large)
+
+        w := PermList(List([1..r ^ 2 - 1], 
+                           a -> (a + ((a - 1) mod r) * r) mod r ^2));
+        W := PermutationMat(w);
+        listOfWi := List([1..m - 1], 
+                         i -> KroneckerProduct(KroneckerProduct(IdentityMat(r ^ (m - 1 - i), 
+                                                                            GF(q)), 
+                                               W), IdentityMat(r ^ (i - 1), GF(q))));
+    fi;
 
     generatingScalar := zeta * IdentityMat(r ^ m, GF(q));
     result := OddExtraspecialGroup;
