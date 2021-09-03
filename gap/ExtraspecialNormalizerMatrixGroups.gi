@@ -75,8 +75,10 @@ function(r, m, q)
     local d, listOfUi, listOfVi, listOfWi, generatorsOfNormalizerInGL,
     generatorsOfExtraspecialGroup, scalarMultiplierUi, scalarMultiplierVi,
     scalarMultiplierWi, generators, generatingScalar;
+
     # Construction as in Proposition 9.5 of [2]
     d := r ^ m
+
     if r mod 2 = 1 then
         generatorsOfNormalizerInGL := OddExtraspecialNormalizer(r, m, q);
         # These are the Xi and Yi
@@ -86,39 +88,47 @@ function(r, m, q)
         listOfVi := generatorsOfNormalizerInGL.listOfVi;
         listOfWi := generatorsOfNormalizerInGL.listOfWi;
 
-        if d <> 3 then
-            # Let G denote the normalizer of the extraspecial group r ^ (1 + 2 * m)
-            # in GL(d, q), where d = r ^ m. Then, according to the proof of
-            # Proposition 9.5 of [2], we have G = (G intersect SL(d, q))Z(G) in
-            # the present case of d <> 3, which means precisely that we can
-            # multiply each element of G by a scalar matrix in such a way that
-            # the result has determinant 1. In particular, all of the
-            # determinants of the generators Ui, Vi, Wi of G have a dth root in
-            # GF(q). Note that det(Xi) = det(Yi) = 1 already and that, by
-            # construction, det(Ui), det(Vi) and det(Wi) are independent of i
-            # so that, in fact, we only have to compute three dth roots in
-            # GF(q) (that is, the dth roots of det(U1), det(V1) and det(W1)).
+        # We always need a generating element of Z(SL(d, q))
+        generatingScalar := zeta ^ (QuoInt(q - 1, Gcd(q - 1, r ^ m))) *
+        IdentityMat(r ^ m, GF(q));
 
-            scalarMultiplierUi := ScalarToNormalizeDeterminant(listOfUi[1], 
-                                                               d, GF(q));
-            scalarMultiplierVi := ScalarToNormalizeDeterminant(listOfVi[1], 
-                                                               d, GF(q));
-            scalarMultiplierWi := ScalarToNormalizeDeterminant(listOfWi[1], 
-                                                               d, GF(q));
 
-            listOfUi := List(listOfUi, Ui -> scalarMultiplierUi * Ui);
-            listOfVi := List(listOfVi, Vi -> scalarMultiplierVi * Vi);
-            listOfWi := List(listOfWi, Wi -> scalarMultiplierWi * Wi);
+        # Note that not only det(Xi) = det(Yi) = 1, but as d is odd we
+        # also have det(Wi) = 1, so these do not have to be rescaled to
+        # determinant 1. However, we do not necessarily have det(Vi) = 1, but
+        # in the case d odd, we can always rescale Vi to determinant 1 by
+        # finding a d-th root of det(Vi) in GF(q) (which exists!). We can save
+        # computations by observing that det(Vi) is independent of i and thus
+        # we only need to compute one d-th root.
 
-            # Finally, we need a generating element of Z(SL(d, q))
-            generatingScalar := zeta ^ (QuoInt(q - 1, Gcd(q - 1, r ^ m))) *
-            IdentityMat(r ^ m, GF(q));
+        scalarMultiplierVi := ScalarToNormalizeDeterminant(listOfVi[1], 
+                                                           d, GF(q));
+        listOfVi := List(listOfVi, Vi -> scalarMultiplierVi * Vi);
 
-            generators := Concatenation([generatingScalar],
-                                        generatorsOfExtraspecialGroup, 
-                                        listOfUi, listOfVi, listOfWi);
-        else
-            
+        if d = 3 then
+            # In the case d <> 3 and d odd, we have det(Ui) = 1 and therefore
+            # we do not need to rescale Ui to determinant 1.    
+            # If d = 3, we can find a d-th root in GF(q) for det(Ui) if and
+            # only if r ^ 2 | q - 1. If not, we append U1 ^ -1 * V1 * U1 
+            # instead of U1 (note that m = 1) to the generating set (where V1 
+            # is already normalized to determinant 1).
+
+            if (q - 1) mod (r ^ 2) = 0 then
+                # We can find a d-th root of det(Ui) = omega in GF(q)
+
+                scalarMultiplierUi := ScalarToNormalizeDeterminant(listOfUi[1],
+                                                                   d, GF(q));
+                listOfUi := List(listOfUi, Ui -> scalarMultiplierUi * Ui);
+            else
+                # Note that Length(listOfUi) = m = 1 here and use 
+                # U1 ^ -1 * V1 * U1 instead of U1
+
+                listOfUi := [listOfUi[1] ^ -1 * listOfVi[1] * listOfUi[1]];
+            fi;
         fi;
+
+        generators := Concatenation([generatingScalar],
+                                    generatorsOfExtraspecialGroup, 
+                                    listOfUi, listOfVi, listOfWi);
     fi;
 end);
