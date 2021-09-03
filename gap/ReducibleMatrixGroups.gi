@@ -15,6 +15,6 @@ function(n, q, k)
                          Concatenation([[1, n - k + 1, 1]], transvecDiag));
     result := Group(Concatenation([A5], GeneratorsOfGroup(dirProd), [T]));
     SetSize(result,
-            q ^ (k * (n-k)) * Size(SL(k, q)) * Size(SL(n-k, q)) * (q-1));
+            q ^ (k * (n - k)) * Size(SL(k, q)) * Size(SL(n - k, q)) * (q-1));
     return result;
 end);
