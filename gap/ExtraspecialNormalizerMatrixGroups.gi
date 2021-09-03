@@ -278,7 +278,7 @@ end;
 
 # TODO
 # It seems really pointless here to do this for anything with m > 1 since the
-# intersection of the normalizer with the SL is only relevant in case S for n = 2.
+# intersection of the normalizer with the SL is only relevant in case L for n = 2.
 # --> Talk this over with Sergio!!
 #
 # Construction as in Proposition 9.5 of [2]
