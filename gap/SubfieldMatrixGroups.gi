@@ -6,13 +6,13 @@
 # that the quotient <C>f / e</C> be a prime number as well, i.e. <C>GF(p ^ e)
 # </C> is a prime extension of <C>GF(p ^ f)</C>.
 # Construction as in Proposition 8.1 of [2] 
-InstallGlobalFunction(SubfieldSL, 
+BindGlobal("SubfieldSL", 
 function(n, p, e, f)
     local A, B, C, D, c, k, matrixForCongruence, lambda, zeta, omega, z, X,
         result;
     if e mod f <> 0 or not IsPrimeInt(QuoInt(e, f)) then
-        ErrorNoReturn("<f> must be a divisor of <e> and their quotient must be
-                      a prime but <e> = ", e, "<f> = ", f);
+        ErrorNoReturn("<f> must be a divisor of <e> and their quotient must be a prime but <e> = ", 
+                      e, "<f> = ", f);
     fi;
 
     A := SL(n, p ^ f).1;

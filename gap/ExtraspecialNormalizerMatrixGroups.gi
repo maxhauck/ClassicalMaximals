@@ -95,7 +95,7 @@ SymplecticTypeNormalizerInGL := function(m, q)
                       q, "<m> = ", m);
     fi;
 
-    result := OddExtraspecialNormalizer(2, m, q);
+    result := OddExtraspecialNormalizerInGL(2, m, q);
     
     # In fact, we do not need the matrix Z mentioned in Lemma 9.3: It is only
     # needed as a generator of the symplectic type subgroup of GL(d, q), but
@@ -120,13 +120,13 @@ end;
 # Construction as in Lemma 9.4 of [2]
 Extraspecial2MinusTypeNormalizerInGL := function(m, q)
     local solutionQuadraticCongruence, a, b, kroneckerFactorX1, kroneckerFactorY1, 
-    kroneckerFactorU1, kroneckerFactorV1, kroneckerFactorW1, result;
+    kroneckerFactorU1, kroneckerFactorV1, kroneckerFactorW1, result, p;
 
     if (q - 1) mod 2 <> 0 then
         ErrorNoReturn("<q> must be odd but <q> = ", q);
     fi;
 
-    result := OddExtraspecialNormalizer(2, m, q);
+    result := OddExtraspecialNormalizerInGL(2, m, q);
    
     p := PrimeDivisors(q)[1];
     solutionQuadraticCongruence := SolveQuadraticCongruence(p);
@@ -186,9 +186,10 @@ end;
 # Construction as in Proposition 9.5 of [2]
 OddExtraspecialNormalizerInSL := function(r, m, q)
     local d, listOfUi, listOfVi, generatorsOfNormalizerInGL, scalarMultiplierUi, 
-    scalarMultiplierVi, generators, generatingScalar, result;
+    scalarMultiplierVi, generators, generatingScalar, result, zeta;
 
-    d := r ^ m
+    d := r ^ m;
+    zeta := PrimitiveElement(GF(q));
 
     generatorsOfNormalizerInGL := OddExtraspecialNormalizerInGL(r, m, q);
     listOfUi := generatorsOfNormalizerInGL.listOfUi;
@@ -248,7 +249,7 @@ end;
 SymplecticTypeNormalizerInSL := function(m, q)
     local generatorsOfNormalizerInGL, d, listOfUi, listOfVi, listOfWi,
     generatingScalar, scalarMultiplierVi, scalarMultiplierUiAndWi, p, e, 
-    factorization, generators, result;
+    factorization, generators, result, zeta;
     
     if (q - 1) mod 4 <> 0 or m < 2 then
         ErrorNoReturn("<q> must be 1 mod 4 and <m> must be at least 2 but <q> = ",
@@ -260,6 +261,7 @@ SymplecticTypeNormalizerInSL := function(m, q)
     factorization := PrimePowersInt(q);
     p := factorization[1];
     e := factorization[2];
+    zeta := PrimitiveElement(GF(q));
 
     generatorsOfNormalizerInGL := SymplecticTypeNormalizerInGL(m, q);
     listOfUi := generatorsOfNormalizerInGL.listOfUi;
@@ -267,7 +269,7 @@ SymplecticTypeNormalizerInSL := function(m, q)
     listOfWi := generatorsOfNormalizerInGL.listOfWi;
 
     # We always need a generating element of Z(SL(d, q))
-    generatingScalar := zeta ^ (QuoInt(q - 1, Gcd(q - 1, r ^ m))) *
+    generatingScalar := zeta ^ (QuoInt(q - 1, Gcd(q - 1, 2 ^ m))) *
     IdentityMat(d, GF(q));
 
     # Note that det(Xi) = det(Yi) = 1, so we do not need to rescale these to
@@ -305,7 +307,7 @@ SymplecticTypeNormalizerInSL := function(m, q)
             # according to the Magma code; in particular, they both have
             # determinant 1.
             listOfUi := [listOfUi[1] ^ (-1) * listOfUi[2]];
-            listWi := [listOfUi[1] ^ (-1) * listOfWi[1]];
+            listOfWi := [listOfUi[1] ^ (-1) * listOfWi[1]];
         fi;
 
         # Now we deal with the Vi
@@ -345,21 +347,23 @@ end;
 # Only for d = 2
 Extraspecial2MinusTypeNormalizerInSL := function(q)
     local generatorsOfNormalizerInGL, generatingScalar, p, e, V1, U1,
-    factorization, generators, result, scalarMultiplierV1, scalarMultiplierU1;
+    factorization, generators, result, scalarMultiplierV1, scalarMultiplierU1,
+    zeta;
 
     # q = p ^ e with p prime
     factorization := PrimePowersInt(q);
     p := factorization[1];
     e := factorization[2];
+    zeta := PrimitiveElement(GF(q));
 
-    generatorsOfNormalizerInGL := Extraspecial2MinusTypeNormalizerInGL(m, q);
+    generatorsOfNormalizerInGL := Extraspecial2MinusTypeNormalizerInGL(1, q);
     # Note that we only have the matrices X1, Y1, U1, V1
     U1 := generatorsOfNormalizerInGL.listOfUi[1];
     V1 := generatorsOfNormalizerInGL.listOfVi[1];
 
     # We always need a generating element of Z(SL(d, q))
-    generatingScalar := zeta ^ (QuoInt(q - 1, Gcd(q - 1, r ^ m))) *
-    IdentityMat(d, GF(q));
+    generatingScalar := zeta ^ (QuoInt(q - 1, Gcd(q - 1, 2))) *
+    IdentityMat(2, GF(q));
 
     # Note that det(X1) = det(Y1) = 1, so we do not need to rescale these to
     # determinant 1. Furthermore, det(V1) = 4 and this is always a square, so

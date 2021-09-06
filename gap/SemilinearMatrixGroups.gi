@@ -41,7 +41,7 @@ end);
 # further demand that <A>s</A> be a prime number, i.e. <M>F'</M> is a prime
 # extension of <M>F</M>.
 # Construction as in Proposition 6.3 of [2]
-InstallGlobalFunction(GammaLMeetSL,
+BindGlobal("GammaLMeetSL",
 function(n, q, s)
     local As, rootAs, Bs, Cs, Fs, m, gammaL1, Y, A, B, C, D, DBlock, ZBlock, i,
     range, result;
