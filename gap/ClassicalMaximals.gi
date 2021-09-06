@@ -3,10 +3,12 @@
 #
 # Code along the lines of:
 # [1]   J. M. Bray, D. F. Holt, C. M. Roney-Dougal. "The Maximal Subgroups of the
-#       Low-Dimensional Finite Classical Groups". Cambridge UP, 2013.
+#       Low-Dimensional Finite Classical Groups." Cambridge UP, 2013.
 # [2]   D. F. Holt, C. M. Roney-Dougal. "Constructing Maximal Subgroups of
 #       Classical Groups." LMS Journal of Computation and Mathematics, vol. 8,
 #       2005, pp. 46-79.
+# [3]   P. Kleidman, M. Liebeck. "The Subgroup Structure of the Finite
+#       Classical Groups." Cambridge UP, 1990.
 #
 # Implementations
 #
@@ -78,6 +80,41 @@ C5SubgroupsSpecialLinearGroupGeneric := function(n, q)
                                                          generatorGLMinusSL, 
                                                          numberOfConjugates));
     od;
+
+    return result;
+end;
+
+C6SubgroupsSpecialLinearGroupGeneric := function(n, q)
+    local factorisationOfq, p, e, factorisationOfn, r, m, result;
+
+    result := [];
+    if not IsPrimePowerInt(n) then
+        return result;
+    fi;
+    
+    factorisationOfq := PrimePowersInt(q);
+    p := factorisationOfq[1];
+    e := factorisationOfq[2];
+    factorisationOfn := PrimePowersInt(n);
+    r := factorisationOfn[1];
+    m := factorisationOfn[2];
+
+    # Cf. Table 4.6.B and the corresponding definition in [3]
+    if IsOddInt(r) then
+        if IsOddInt(e) and e = OrderMod(p, r) then
+            Add(result, ExtraspecialNormalizerInSL(r, m, q)); 
+        fi;
+    elif m >= 2 then
+        # n = 2 ^ m >= 4
+        if e = 1 and (q - 1) mod 4 = 0 then
+            Add(result, ExtraspecialNormalizerInSL(2, m, q));
+        fi;
+    else
+        # n = 2
+        if e = 1 and (q - 1) mod 2 = 0 then
+            Add(result, ExtraspecialNormalizerInSL(2, 1, q));
+        fi;
+    fi;
 
     return result;
 end;
@@ -165,7 +202,6 @@ function(n, q)
     fi;
 
     # Class C5 subgroups ######################################################
-    #
     # Cf. Propositions 3.2.4 (n = 3), 3.3.5 (n = 4), 3.4.3 (n = 5), 
     #                  3.5.7 (n = 6), 3.6.3 (n = 7), 3.7.8 (n = 8),
     #                  3.8.4 (n = 9), 3.9.7 (n = 10), 3.10.3 (n = 11),
@@ -181,6 +217,15 @@ function(n, q)
                                               C5SubgroupsSpecialLinearGroupGeneric(2, q));
         fi;
     fi;
+
+    # Class C6 subgroups ######################################################
+    # Cf. Lemma 3.1.6 (n = 2) and Propositions 3.2.5 (n = 3), 3.3.6 (n = 4),
+    #                                          3.4.3 (n = 5), 3.6.3 (n = 7),
+    #                                          3.7.9 (n = 8), 3.8.5 (n = 9), 
+    #                                          3.10.3 (n = 11) in [1]
+    # For all other n, class C6 is empty.
+    maximalSubgroups := Concatenation(maximalSubgroups,
+                                      C6SubgroupsSpecialLinearGroupGeneric(n, q));
 
     return maximalSubgroups;
 end);
