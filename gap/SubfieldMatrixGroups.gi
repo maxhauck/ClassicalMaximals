@@ -12,7 +12,7 @@ function(n, p, e, f)
         result;
     if e mod f <> 0 or not IsPrimeInt(QuoInt(e, f)) then
         ErrorNoReturn("<f> must be a divisor of <e> and their quotient must be a prime but <e> = ", 
-                      e, "<f> = ", f);
+                      e, " and <f> = ", f);
     fi;
 
     A := SL(n, p ^ f).1;

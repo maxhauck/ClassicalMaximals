@@ -47,7 +47,7 @@ function(n, q, s)
     range, result;
     if n mod s <> 0 or not IsPrime(s) then
         ErrorNoReturn("<s> must be prime and a divisor of <n> but <s> = ", s,
-                      "<n> = ", n);
+                      " and <n> = ", n);
     fi;
     gammaL1 := CLASSICALMAXIMALS_GammaLDimension1(s, q);
     # Let w be a primitive element of GF(q ^ s) over GF(q). Since As is the

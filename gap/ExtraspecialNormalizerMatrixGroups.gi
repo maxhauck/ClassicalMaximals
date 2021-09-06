@@ -4,13 +4,13 @@ OddExtraspecialGroup := function(r, m, q)
 
     if (q - 1) mod r <> 0 or not IsPrime(r) then
         ErrorNoReturn("<r> must be prime and a divisor of <q> - 1 but <r> = ", r,
-                      "<q> = ", q);
+                      " and <q> = ", q);
     fi; 
     zeta := PrimitiveElement(GF(q));
     omega := zeta ^ (QuoInt(q - 1, r));
     X := DiagonalMat(List([0..r - 1], i -> omega ^ i));
-    permutationMatrixEntries := Concatenation(List([1..r - 1], i -> [i, i+1,
-    zeta ^ 0]), [r, 1, zeta ^ 0]);
+    permutationMatrixEntries := Concatenation(List([1..r - 1], i -> [i, i + 1,
+    zeta ^ 0]), [[r, 1, zeta ^ 0]]);
     Y := MatrixByEntries(GF(q), r, r, permutationMatrixEntries);
 
     listOfXi := List([1..m], i ->
@@ -26,7 +26,7 @@ end;
 # Construction as in Lemma 9.2 of [2]
 OddExtraspecialNormalizerInGL := function(r, m, q)
     local zeta, omega, U, V, W, listOfUi, listOfVi, listOfWi, matrixIndices,
-    entriesOfV, w, generatingScalar, result;
+    entriesOfV, w, generatingScalar, result, listForPermutation;
 
     zeta := PrimitiveElement(GF(q));
     omega := zeta ^ (QuoInt(q - 1, r));
@@ -48,9 +48,14 @@ OddExtraspecialNormalizerInGL := function(r, m, q)
         # If m = 1 then we cannot have the Wi as generators since W is in 
         # GL(r ^ 2, q) (i.e. too large)
 
-        w := PermList(List([1..r ^ 2 - 1], 
-                           a -> (a + ((a - 1) mod r) * r) mod r ^2));
-        W := PermutationMat(w);
+        listForPermutation := List([1..r ^ 2], 
+                                   a -> (a + ((a - 1) mod r) * r) mod r ^ 2);
+        # GAP lists start at index 1 so we have to make this fix: the element
+        # mapped to 0 under the above operation is r and must be "re-mapped" to
+        # r ^ 2 instead.
+        listForPermutation[r] := r ^ 2;
+        w := PermList(listForPermutation);
+        W := Z(q) ^ 0 * PermutationMat(w, r ^ 2);
         listOfWi := List([1..m - 1], 
                          i -> KroneckerProduct(KroneckerProduct(IdentityMat(r ^ (m - 1 - i), 
                                                                             GF(q)), 
@@ -92,7 +97,7 @@ SymplecticTypeNormalizerInGL := function(m, q)
 
     if (q - 1) mod 4 <> 0 or m < 2 then
         ErrorNoReturn("<q> must be 1 mod 4 and <m> must be at least 2 but <q> = ",
-                      q, "<m> = ", m);
+                      q, " and <m> = ", m);
     fi;
 
     result := OddExtraspecialNormalizerInGL(2, m, q);
@@ -243,9 +248,6 @@ OddExtraspecialNormalizerInSL := function(r, m, q)
     if d = 3 and ((q - 4) mod 9 = 0 or (q - 7) mod 9 = 0) then
         SetSize(result, 27 * 8);
     else
-        # TODO
-        # Is the following correct? 
-        # --> Talk this over with Sergio
         SetSize(result, 
                 Gcd(q - 1, d) * r ^ (2 * m) * Size(SymplecticGroup(2 * m, r)));
     fi;
@@ -260,7 +262,7 @@ SymplecticTypeNormalizerInSL := function(m, q)
     
     if (q - 1) mod 4 <> 0 or m < 2 then
         ErrorNoReturn("<q> must be 1 mod 4 and <m> must be at least 2 but <q> = ",
-                      q, "<m> = ", m);
+                      q, " and <m> = ", m);
     fi;
 
     d := 2 ^ m;
@@ -292,65 +294,47 @@ SymplecticTypeNormalizerInSL := function(m, q)
                                                            d, GF(q));
         listOfVi := List(listOfVi, Vi -> scalarMultiplierVi * Vi);
     
-    else
-    
-        # We first deal with the Ui and Wi
-    
-        if (q - 1) mod 8 = 0 then
-            # This is m = 2 and q = 1 mod 8. Here we have det(Ui) = det(Wi) = -1
-            # and we can find d-th roots for det(Ui) and det(Wi).
+    elif (q - 1) mod 8 = 0 then
+        # This is m = 2 and q = 1 mod 8. Here we have det(Ui) = det(Wi) = -1
+        # and we can find d-th roots for det(Ui) and det(Wi).
+        #
+        # This is also the case where we can find a d-th root for det(Vi):
+        # For det(Vi) to have a d-th root in GF(q), we need e even or 
+        # p = 1, 3, 7 mod 8; however, if e is even, then q = 1 mod 8, if e
+        # is odd, then q = p ^ e = p mod 8 since p ^ 2 = 1 mod 8 and
+        # because we only allow q = 1 mod 4, this reduces the condition 
+        # p = 1, 3, 7 mod 8 to q = p = 1 mod 8.
 
-            scalarMultiplierUiAndWi := ScalarToNormalizeDeterminant(listOfUi[1],
-                                                                    d, GF(q));
-            listOfUi := List(listOfUi, Ui -> scalarMultiplierUiAndWi * Ui);
-            listOfWi := List(listOfWi, Wi -> scalarMultiplierUiAndWi * Wi);
-        else
-            # Still m = 2 but now q <> 1 mod 8. Now we cannot rescale Wi and Ui to
-            # determinant 1 since det(Wi) = det(Ui) = -1 and there are no 8th roots
-            # of unity in GF(q).
-
-            # Note that Length(listOfUi) = m = 2, Length(listOfWi) = m - 1 = 1.
-            # Taking these two elements instead of the Ui and Wi should work
-            # according to the Magma code; in particular, they both have
-            # determinant 1.
-            listOfUi := [listOfUi[1] ^ (-1) * listOfUi[2]];
-            listOfWi := [listOfUi[1] ^ (-1) * listOfWi[1]];
-        fi;
-
-        # Now we deal with the Vi
-
-        # For completeness, we note that p = 3, 7 mod 8 and e odd can
-        # technically not occur here: For e odd we have q = p ^ e = p mod 8 
-        # (since p is odd and therefore p ^ 2 = 1 mod 8) and we require q = 1 mod 4;
-        # hence, we can only have p = 1, 5 mod 8 for e odd.
-        if IsEvenInt(e) or (p - 1) mod 8 = 0 or (p - 3) mod 8 = 0 
-                                             or (p - 7) mod 8 = 0 then
-            # We can still rescale the Vi to determinant 1.
-
-            scalarMultiplierVi := ScalarToNormalizeDeterminant(listOfVi[1],
+        scalarMultiplierUiAndWi := ScalarToNormalizeDeterminant(listOfUi[1],
+                                                                d, GF(q));
+        scalarMultiplierVi := ScalarToNormalizeDeterminant(listOfVi[1],
                                                            d, GF(q));
-            listOfVi := List(listOfVi, Vi -> scalarMultiplierVi * Vi);
-        else
-            # Now we cannot rescale the Vi to determinant 1. 
+        listOfUi := List(listOfUi, Ui -> scalarMultiplierUiAndWi * Ui);
+        listOfWi := List(listOfWi, Wi -> scalarMultiplierUiAndWi * Wi);
+        listOfVi := List(listOfVi, Vi -> scalarMultiplierVi * Vi);
+    else
+        # Still m = 2 but now q <> 1 mod 8. Now we cannot rescale Wi and Ui to
+        # determinant 1 since det(Wi) = det(Ui) = -1 and there are no 8th roots
+        # of unity in GF(q). We cannot rescale Vi to determinant 1 either.
 
-            # Note that Length(listOfVi) = m = 2. Taking this one element
-            # instead of the Vi should work according to the Magma code.
-            listOfVi := [listOfVi[1] ^ (-1) * listOfVi[2]];
-        fi;
-    fi;    
-
+        # Taking these elements instead of the Ui, Wi, Vi should suffice
+        # according to the Magma code; note that they all have determinant 1.
+        listOfUi := [listOfUi[1] ^ (-1) * listOfUi[2]];
+        listOfWi := [listOfUi[1] ^ (-1) * listOfWi[1]];
+        listOfVi := [listOfVi[1] ^ (-1) * listOfVi[2]];
+    fi;
     generators := Concatenation([generatingScalar],
                                 generatorsOfNormalizerInGL.listOfXi,
                                 generatorsOfNormalizerInGL.listOfYi,
                                 listOfUi, listOfVi, listOfWi);
     result := Group(generators);
     # Size according to Table 2.9 of [1]
-    if d = 4 and (q - 5) mod 8 = 0 then
-        SetSize(result, 2 ^ 6 * Factorial(6) / 2);
-    else
-        SetSize(result, 
-                Gcd(q - 1, d) * 2 ^ (2 * m) * Size(SymplecticGroup(2 * m, 2)));
-    fi;
+    # if d = 4 and (q - 5) mod 8 = 0 then
+    #     SetSize(result, 2 ^ 6 * Factorial(6) / 2);
+    # else
+    #     SetSize(result, 
+    #             Gcd(q - 1, d) * 2 ^ (2 * m) * Size(SymplecticGroup(2 * m, 2)));
+    # fi;
     return result;
 end;
 
@@ -388,15 +372,21 @@ Extraspecial2MinusTypeNormalizerInSL := function(q)
         scalarMultiplierU1 := ScalarToNormalizeDeterminant(U1, 2, GF(q));
         U1 := scalarMultiplierU1 * U1;
 
+        generators := Concatenation([generatingScalar],
+                                    generatorsOfNormalizerInGL.listOfXi,
+                                    generatorsOfNormalizerInGL.listOfYi,
+                                    [U1, V1]);
+
+    else
         # According to the Magma code, there is no need to take another
         # generator instead of U1 if we cannot rescale it to determinant 1 - we
         # simply discard U1 as a generator.
+        generators := Concatenation([generatingScalar],
+                                    generatorsOfNormalizerInGL.listOfXi,
+                                    generatorsOfNormalizerInGL.listOfYi,
+                                    [V1]);
     fi;
 
-    generators := Concatenation([generatingScalar],
-                                generatorsOfNormalizerInGL.listOfXi,
-                                generatorsOfNormalizerInGL.listOfYi,
-                                [U1, V1]);
     result := Group(generators);
     # Size according to Table 2.9 of [1]
     if (q - 1) mod 8 = 0 or (q - 7) mod 8 = 0 then
