@@ -53,7 +53,7 @@ C3SubgroupsSpecialLinearGroupGeneric := function(n, q)
     primeDivisorsOfn := PrimeDivisors(n);
     result := [];
     for s in primeDivisorsOfn do
-        Add(maximalSubgroups, GammaLMeetSL(n, q, s));
+        Add(result, GammaLMeetSL(n, q, s));
     od;
     return result;
 end;
@@ -121,7 +121,7 @@ function(n, q)
     elif n = 2 then
         if not q in [5, 7, 9] then
             # Cf. Lemma 3.1.3 in [1]
-            Add(maximalSubgroups, ImprimitivesMeetSL(2, q, 2);
+            Add(maximalSubgroups, ImprimitivesMeetSL(2, q, 2));
             
             # TODO
             # original Magma code also has an exception for n = 2 and q = 11,
@@ -132,11 +132,11 @@ function(n, q)
         # n = 4
         if q >= 7 then
             # Cf. Proposition 3.3.2 in [1]
-            Add(maximalSubgroups, ImprimitivesMeetSL(4, q, 4);
+            Add(maximalSubgroups, ImprimitivesMeetSL(4, q, 4));
         fi;
         if q > 3 then
             # Cf. Proposition 3.3.3 in [1]
-            Add(maximalSubgroups, ImprimitivesMeetSL(4, q, 2)
+            Add(maximalSubgroups, ImprimitivesMeetSL(4, q, 2));
         fi;
     fi;
 
@@ -144,8 +144,8 @@ function(n, q)
     # Cf. Propositions 3.3.4 (n = 4), 3.4.3 (n = 5), 3.5.5 (n = 6), 
     #                  3.6.3 (n = 7), 3.7.5 (n = 8), 3.8.3 (n = 9),
     #                  3.9.5 (n = 10), 3.10.3 (n = 11), 3.11.7 (n = 12) in [1]
-    if n not in [2, 3] then
-        Add(maximalSubgroups, C3SubgroupsSpecialLinearGroupGeneric(n, q);
+    if not n in [2, 3] then
+        Add(maximalSubgroups, C3SubgroupsSpecialLinearGroupGeneric(n, q));
     elif n = 2 then
         if q <> 7 then
             # Cf. Lemma 3.1.4 in [1]

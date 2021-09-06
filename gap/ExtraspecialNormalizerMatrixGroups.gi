@@ -328,6 +328,11 @@ SymplecticTypeNormalizerInSL := function(m, q)
                                 generatorsOfNormalizerInGL.listOfYi,
                                 listOfUi, listOfVi, listOfWi);
     result := Group(generators);
+
+    # TODO
+    # The size of the result in the case d = 4 (i.e. m = 2) and q = 5 mod 8
+    # does not agree with what one might expect give Table 2.9 of [1]
+
     # Size according to Table 2.9 of [1]
     # if d = 4 and (q - 5) mod 8 = 0 then
     #     SetSize(result, 2 ^ 6 * Factorial(6) / 2);
