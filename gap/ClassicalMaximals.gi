@@ -130,6 +130,10 @@ C6SubgroupsSpecialLinearGroupGeneric := function(n, q)
     else
         # n = 2
         if e = 1 and (q - 1) mod 2 = 0 then
+            if q mod 40 in [11, 19, 21, 29] then
+                # Cf. Theorem 6.3.10 in [1]
+                return result;
+            fi;
             extraspecialNormalizerSubgroup := ExtraspecialNormalizerInSL(2, 1, q);
             if (q - 1) mod 8 = 0 or (q - 7) mod 8 = 0 then
                 result := Concatenation(result,
@@ -182,14 +186,19 @@ function(n, q)
         maximalSubgroups := Concatenation(maximalSubgroups,
                                           C2SubgroupsSpecialLinearGroupGeneric(n, q));
     elif n = 2 then
-        if not q in [5, 7, 9] then
-            # Cf. Lemma 3.1.3 in [1]
+        if not q in [5, 7, 9, 11] then
+            # Cf. Lemma 3.1.3 and Theorem 6.3.10 in [1]
             Add(maximalSubgroups, ImprimitivesMeetSL(2, q, 2));
             
             # TODO
             # original Magma code also has an exception for n = 2 and q = 11,
             # but this is not in [1]
             # --> talk this over with Sergio!!
+            #
+            # Explanation: The propositions in chapter 3 always only talk about
+            # maximality *among the geometric subgroups*. There are additional
+            # containments of some geometric subgroups in subgroups from class
+            # S, which are listed in Theorem 6.3.10
         fi;
     else
         # n = 4
@@ -211,8 +220,8 @@ function(n, q)
         maximalSubgroups := Concatenation(maximalSubgroups, 
                                           C3SubgroupsSpecialLinearGroupGeneric(n, q));
     elif n = 2 then
-        if q <> 7 then
-            # Cf. Lemma 3.1.4 in [1]
+        if not q in [7, 9] then
+            # Cf. Lemma 3.1.4 and Theorem 6.3.10 in [1]
             maximalSubgroups := Concatenation(maximalSubgroups, 
                                               C3SubgroupsSpecialLinearGroupGeneric(2, q));
 
@@ -220,6 +229,8 @@ function(n, q)
             # original Magma code also has an exception for n = 2 and q = 9,
             # but this is not in [1]
             # --> talk this over with Sergio!!
+            #
+            # Explanation: See class C2 above.
         fi;
     else 
         # n = 3
