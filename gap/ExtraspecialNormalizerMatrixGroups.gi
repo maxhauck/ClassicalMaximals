@@ -337,12 +337,50 @@ SymplecticTypeNormalizerInSL := function(m, q)
     # Set size of result
 end;
 
-# TODO
-# It seems really pointless here to do this for anything with m > 1 since the
-# intersection of the normalizer with the SL is only relevant in case L for n = 2.
-# --> Talk this over with Sergio!!
-# --> Sergio approves (yay!) :D
-#
 # Construction as in Proposition 9.5 of [2]
-Extraspecial2MinusTypeNormalizerInSL := function(m, q)
+# Only for d = 2
+Extraspecial2MinusTypeNormalizerInSL := function(q)
+    local generatorsOfNormalizerInGL, generatingScalar, p, e, V1, U1,
+    factorization, generators, result, scalarMultiplierV1, scalarMultiplierU1;
+
+    # q = p ^ e with p prime
+    factorization := PrimePowersInt(q);
+    p := factorization[1];
+    e := factorization[2];
+
+    generatorsOfNormalizerInGL := Extraspecial2MinusTypeNormalizerInGL(m, q);
+    # Note that we only have the matrices X1, Y1, U1, V1
+    U1 := generatorsOfNormalizerInGL.listOfUi[1];
+    V1 := generatorsOfNormalizerInGL.listOfVi[1];
+
+    # We always need a generating element of Z(SL(d, q))
+    generatingScalar := zeta ^ (QuoInt(q - 1, Gcd(q - 1, r ^ m))) *
+    IdentityMat(d, GF(q));
+
+    # Note that det(X1) = det(Y1) = 1, so we do not need to rescale these to
+    # determinant 1. Furthermore, det(V1) = 4 and this is always a square, so
+    # we can always rescale V1 to determinant 1.
+    scalarMultiplierV1 := ScalarToNormalizeDeterminant(V1, 2, GF(q));
+    V1 := scalarMultiplierV1 * V1;
+
+    if IsEvenInt(e) or (p - 1) mod 8 = 0 or (p - 7) mod 8 = 0 then
+        # These are the cases where we can find a square root of det(U1) = 2 in
+        # GF(q) to rescale U1 to determinant 1.
+        scalarMultiplierU1 := ScalarToNormalizeDeterminant(U1, 2, GF(q));
+        U1 := scalarMultiplierU1 * U1;
+
+        # According to the Magma code, there is no need to take another
+        # generator instead of U1 if we cannot rescale it to determinant 1 - we
+        # simply discard U1 as a generator.
+    fi;
+
+    generators := Concatenation([generatingScalar],
+                                generatorsOfNormalizerInGL.listOfXi,
+                                generatorsOfNormalizerInGL.listOfYi,
+                                [U1, V1]);
+    result := Group(generators);
+    return result;
+
+    # TODO
+    # Set size of result
 end;
