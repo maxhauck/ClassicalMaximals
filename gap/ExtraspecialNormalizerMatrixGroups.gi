@@ -239,10 +239,17 @@ OddExtraspecialNormalizerInSL := function(r, m, q)
                                 listOfUi, listOfVi,
                                 generatorsOfNormalizerInGL.listOfWi);
     result := Group(generators);
+    # Size according to Table 2.9 of [1]
+    if d = 3 and ((q - 4) mod 9 = 0 or (q - 7) mod 9 = 0) then
+        SetSize(result, 27 * 8);
+    else
+        # TODO
+        # Is the following correct? 
+        # --> Talk this over with Sergio
+        SetSize(result, 
+                Gcd(q - 1, d) * r ^ (2 * m) * Size(SymplecticGroup(2 * m, r)));
+    fi;
     return result;
-    
-    # TODO
-    # Set size of result
 end;
 
 # Construction as in Proposition 9.5 of [2]
@@ -337,10 +344,14 @@ SymplecticTypeNormalizerInSL := function(m, q)
                                 generatorsOfNormalizerInGL.listOfYi,
                                 listOfUi, listOfVi, listOfWi);
     result := Group(generators);
+    # Size according to Table 2.9 of [1]
+    if d = 4 and (q - 5) mod 8 = 0 then
+        SetSize(result, 2 ^ 6 * Factorial(6) / 2);
+    else
+        SetSize(result, 
+                Gcd(q - 1, d) * 2 ^ (2 * m) * Size(SymplecticGroup(2 * m, 2);
+    fi;
     return result;
-
-    # TODO
-    # Set size of result
 end;
 
 # Construction as in Proposition 9.5 of [2]
@@ -387,8 +398,24 @@ Extraspecial2MinusTypeNormalizerInSL := function(q)
                                 generatorsOfNormalizerInGL.listOfYi,
                                 [U1, V1]);
     result := Group(generators);
+    # Size according to Table 2.9 of [1]
+    if (q - 1) mod 8 = 0 or (q - 7) mod 8 = 0 then
+        SetSize(result, 2 * Factorial(4));
+    else
+        SetSize(result, Factorial(4));
+    fi;
     return result;
-
-    # TODO
-    # Set size of result
 end;
+
+BindGlobal("ExtraspecialNormalizerInSL",
+function(r, m, q)
+    if IsOddInt(r) then
+        return OddExtraspecialNormalizerInSL(r, m, q);
+    elif m >= 2 then
+        # r = 2 and m >= 2
+        return SymplecticTypeNormalizerInSL(m, q);
+    else
+        # r = 2 and m = 2
+        return Extraspecial2MinusTypeNormalizerInSL(q);
+    fi;
+end);

@@ -14,6 +14,7 @@ function(n, q, k)
     T := MatrixByEntries(GF(q), n, n,
                          Concatenation([[1, n - k + 1, 1]], transvecDiag));
     result := Group(Concatenation([A5], GeneratorsOfGroup(dirProd), [T]));
+    # Size according to Table 2.3 of [1]
     SetSize(result,
             q ^ (k * (n - k)) * Size(SL(k, q)) * Size(SL(n - k, q)) * (q-1));
     return result;

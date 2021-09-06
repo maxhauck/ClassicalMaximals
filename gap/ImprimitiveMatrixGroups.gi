@@ -34,6 +34,7 @@ function(n, q, t)
     );
     Add(newGens, E);
     result := Group(newGens);
+    # Size according to Table 2.5 of [1]
     SetSize(result, Size(SL(n/t, q)) ^ t * (q-1) ^ (t-1) * Factorial(t));
     return result;
 end);

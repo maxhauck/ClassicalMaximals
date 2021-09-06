@@ -24,6 +24,7 @@ function(n, p, e, f)
 
     if c = Gcd(p ^ f - 1, n) then
         result := Group(A, B, C);
+        # Size according to Table 2.8 of [1]
         SetSize(result, Size(SL(n, p ^ f)) * Gcd(QuoInt(p ^ e - 1, p ^ f -
         1), n));
         return result;
@@ -40,6 +41,7 @@ function(n, p, e, f)
 
     X := zeta ^ (-lambda) * IdentityMat(n, GF(p ^ e));
     result := Group(A, B, C, X * D);
+    # Size according to Table 2.8 of [1]
     SetSize(result,
             Size(SL(n, p ^ f)) * Gcd(QuoInt(p ^ e - 1, p ^ f - 1), n)); 
     return result;
