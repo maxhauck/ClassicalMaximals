@@ -84,19 +84,14 @@ end;
 
 # Construction as in Lemma 9.3 of [2]
 SymplecticTypeNormalizerInGL := function(m, q)
-    local listOfXi, listOfYi, listOfUi, listOfVi, listOfWi, U,
-    generatorsOfNormalizerInGLOddConstruction, zeta, psi; 
+    local listOfUi, U, result, zeta, psi; 
 
     if (q - 1) mod 4 <> 0 or m < 2 then
         ErrorNoReturn("<q> must be 1 mod 4 and <m> must be at least 2 but <q> = ",
                       q, "<m> = ", m);
     fi;
 
-    generatorsOfNormalizerInGLOddConstruction := OddExtraspecialNormalizer(2, m, q);
-    listOfXi := generatorsOfNormalizerInGLOddConstruction.listOfXi;
-    listOfYi := generatorsOfNormalizerInGLOddConstruction.listOfYi;
-    listOfVi := generatorsOfNormalizerInGLOddConstruction.listOfVi;
-    listOfWi := generatorsOfNormalizerInGLOddConstruction.listOfWi;
+    result := OddExtraspecialNormalizer(2, m, q);
     
     # In fact, we do not need the matrix Z mentioned in Lemma 9.3: It is only
     # needed as a generator of the symplectic type subgroup of GL(d, q), but
@@ -112,39 +107,23 @@ SymplecticTypeNormalizerInGL := function(m, q)
     listOfUi := List([1..m], i ->
     KroneckerProduct(KroneckerProduct(IdentityMat(2 ^ (m - i), GF(q)), U),
     IdentityMat(2 ^ (i - 1), GF(q))));
+    
+    result.listOfUi := listOfUi;
 
-    return rec(listOfXi := listOfXi, listOfYi := listOfYi, 
-               listOfUi := listOfUi, listOfVi := listOfVi,
-               listOfWi := listOfWi, 
-               generatingScalar := generatorsOfNormalizerInGLOddConstruction.generatingScalar);
+    return result;
 end;
 
 # Construction as in Lemma 9.4 of [2]
 Extraspecial2MinusTypeNormalizerInGL := function(m, q)
-    local listOfXi, listOfYi, listOfUi, listOfVi, listOfWi,
-    generatorsOfNormalizerInGLOddConstruction, solutionQuadraticCongruence, a,
-    b, kroneckerFactorX1, kroneckerFactorY1, kroneckerFactorU1,
-    kroneckerFactorV1, kroneckerFactorW1;
+    local solutionQuadraticCongruence, a, b, kroneckerFactorX1, kroneckerFactorY1, 
+    kroneckerFactorU1, kroneckerFactorV1, kroneckerFactorW1, result;
 
     if (q - 1) mod 2 <> 0 then
         ErrorNoReturn("<q> must be odd but <q> = ", q);
     fi;
 
-    # TODO
-    # Should we omit this since this function is only ever called with m = 1
-    # anyway, in which case we construct all these generators afresh below
-    # anyway?
-    # HOWEVER : It might be really smart to keep this function for arbitrary m
-    # anyway since it appears that this might be handy for the case S (cf.
-    # Table 2.9 in [1]).
-    # --> Talk this over with Sergio!!
-    generatorsOfNormalizerInGLOddConstruction := OddExtraspecialNormalizer(2, m, q);
-    listOfXi := generatorsOfNormalizerInGLOddConstruction.listOfXi;
-    listOfYi := generatorsOfNormalizerInGLOddConstruction.listOfYi;
-    listOfUi := [];
-    listOfVi := generatorsOfNormalizerInGLOddConstruction.listOfVi;
-    listOfWi := generatorsOfNormalizerInGLOddConstruction.listOfWi;
-
+    result := OddExtraspecialNormalizer(2, m, q);
+   
     p := PrimeDivisors(q)[1];
     solutionQuadraticCongruence := SolveQuadraticCongruence(p);
     a := solutionQuadraticCongruence.a; 
@@ -159,9 +138,6 @@ Extraspecial2MinusTypeNormalizerInGL := function(m, q)
     # Determinant 4
     kroneckerFactorV1 := Z(q) ^ 0 * [[1 + a + b, 1 - a + b], 
                                      [-1 - a + b, 1 - a - b]];
-    # TODO 
-    # If we decide to have this function only for m = 1 (see above), then the
-    # if statement below is of course redundant.
     if m <> 1 then
         # Determinant 4
         kroneckerFactorW1 := Z(q) ^ 0 * [[1, 0, 1, 0], [0, 1, 0, 1], 
@@ -169,31 +145,28 @@ Extraspecial2MinusTypeNormalizerInGL := function(m, q)
     fi;
 
     # TODO
-    # If we decide to have this function only for m = 1 (see above), then the
-    # Kronecker products below are unnecessary.
-
+    # It seems we don't need the Ui here, but just U1? 
+    # --> Check this with the Magma code!
+    result.listOfUi := [];
     # Determinant 1
-    listOfXi[1] := KroneckerProduct(IdentityMat(2 ^ (m - 1), GF(q)),
-                                    kroneckerFactorX1);
+    result.listOfXi[1] := KroneckerProduct(IdentityMat(2 ^ (m - 1), GF(q)),
+                                           kroneckerFactorX1);
     # Determinant 1
-    listOfYi[1] := KroneckerProduct(IdentityMat(2 ^ (m - 1), GF(q)),
-                                    kroneckerFactorY1);
+    result.listOfYi[1] := KroneckerProduct(IdentityMat(2 ^ (m - 1), GF(q)),
+                                           kroneckerFactorY1);
     # Determinant 2 ^ (2 ^ (m - 1))
-    listOfUi[1] := KroneckerProduct(IdentityMat(2 ^ (m - 1), GF(q)),
-                                    kroneckerFactorU1);
+    result.listOfUi[1] := KroneckerProduct(IdentityMat(2 ^ (m - 1), GF(q)),
+                                           kroneckerFactorU1);
     # Determinant 4 ^ (2 ^ (m - 1)) = 2 ^ (2 ^ m)
-    listOfVi[1] := KroneckerProduct(IdentityMat(2 ^ (m - 1), GF(q)),
-                                    kroneckerFactorV1);
+    result.listOfVi[1] := KroneckerProduct(IdentityMat(2 ^ (m - 1), GF(q)),
+                                           kroneckerFactorV1);
     if m <> 1 then
         # Determinant 4 ^ (2 ^ (m - 2)) = 2 ^ (2 ^ (m - 1))
-        listOfWi[1] := KroneckerProduct(IdentityMat(2 ^ (m - 2), GF(q)),
-                                        kroneckerFactorW1);
+        result.listOfWi[1] := KroneckerProduct(IdentityMat(2 ^ (m - 2), GF(q)),
+                                               kroneckerFactorW1);
     fi;
 
-    return rec(listOfXi := listOfXi, listOfYi := listOfYi, 
-               listOfUi := listOfUi, listOfVi := listOfVi, 
-               listOfWi := listOfWi, 
-               generatingScalar := generatorsOfNormalizerInGLOddConstruction.generatingScalar);
+    return result;
 end;
 
 ScalarToNormalizeDeterminant := function(matrix, sizeOfMatrix, field)
@@ -208,24 +181,18 @@ end;
 
 # Construction as in Proposition 9.5 of [2]
 OddExtraspecialNormalizerInSL := function(r, m, q)
-    local d, listOfUi, listOfVi, listOfWi, generatorsOfNormalizerInGL,
-    generatorsOfExtraspecialGroup, scalarMultiplierUi, scalarMultiplierVi,
-    scalarMultiplierWi, generators, generatingScalar;
+    local d, listOfUi, listOfVi, generatorsOfNormalizerInGL, scalarMultiplierUi, 
+    scalarMultiplierVi, generators, generatingScalar, result;
 
     d := r ^ m
 
     generatorsOfNormalizerInGL := OddExtraspecialNormalizerInGL(r, m, q);
-    # These are the Xi and Yi
-    generatorsOfExtraspecialGroup := Concatenation(generatorsOfNormalizerInGL.listOfXi,
-                                                   generatorsOfNormalizerInGL.listOfYi);
     listOfUi := generatorsOfNormalizerInGL.listOfUi;
     listOfVi := generatorsOfNormalizerInGL.listOfVi;
-    listOfWi := generatorsOfNormalizerInGL.listOfWi;
 
     # We always need a generating element of Z(SL(d, q))
     generatingScalar := zeta ^ (QuoInt(q - 1, Gcd(q - 1, r ^ m))) *
-    IdentityMat(r ^ m, GF(q));
-
+    IdentityMat(d, GF(q));
 
     # Note that not only det(Xi) = det(Yi) = 1, but as d is odd we
     # also have det(Wi) = 1, so these do not have to be rescaled to
@@ -262,18 +229,112 @@ OddExtraspecialNormalizerInSL := function(r, m, q)
     fi;
 
     generators := Concatenation([generatingScalar],
-                                generatorsOfExtraspecialGroup, 
-                                listOfUi, listOfVi, listOfWi);
+                                generatorsOfNormalizerInGL.listOfXi,
+                                generatorsOfNormalizerInGL.listOfYi,
+                                listOfUi, listOfVi,
+                                generatorsOfNormalizerInGL.listOfWi);
+    result := Group(generators);
+    return result;
+    
+    # TODO
+    # Set size of result
 end;
 
 # Construction as in Proposition 9.5 of [2]
 SymplecticTypeNormalizerInSL := function(m, q)
+    local generatorsOfNormalizerInGL, d, listOfUi, listOfVi, listOfWi,
+    generatingScalar, scalarMultiplierVi, scalarMultiplierUiAndWi, p, e, 
+    factorization, generators, result;
     
     if (q - 1) mod 4 <> 0 or m < 2 then
         ErrorNoReturn("<q> must be 1 mod 4 and <m> must be at least 2 but <q> = ",
                       q, "<m> = ", m);
     fi;
 
+    d := 2 ^ m;
+    # q = p ^ e with p prime
+    factorization := PrimePowersInt(q);
+    p := factorization[1];
+    e := factorization[2];
+
+    generatorsOfNormalizerInGL := SymplecticTypeNormalizerInGL(m, q);
+    listOfUi := generatorsOfNormalizerInGL.listOfUi;
+    listOfVi := generatorsOfNormalizerInGL.listOfVi;
+    listOfWi := generatorsOfNormalizerInGL.listOfWi;
+
+    # We always need a generating element of Z(SL(d, q))
+    generatingScalar := zeta ^ (QuoInt(q - 1, Gcd(q - 1, r ^ m))) *
+    IdentityMat(d, GF(q));
+
+    # Note that det(Xi) = det(Yi) = 1, so we do not need to rescale these to
+    # determinant 1.
+
+    if m >= 3 then
+        # If m >= 3, we have det(Wi) = det(Ui) = 1 and we do not have to
+        # rescale these matrices to determinant 1. Furthermore, we can always
+        # find a d-th root of det(Vi) in the case m >= 3; note that, again
+        # det(Vi) is independent of i.
+
+        scalarMultiplierVi := ScalarToNormalizeDeterminant(listOfVi[1], 
+                                                           d, GF(q));
+        listOfVi := List(listOfVi, Vi -> scalarMultiplierVi * Vi);
+    
+    else
+    
+        # We first deal with the Ui and Wi
+    
+        if (q - 1) mod 8 = 0 then
+            # This is m = 2 and q = 1 mod 8. Here we have det(Ui) = det(Wi) = -1
+            # and we can find d-th roots for det(Ui) and det(Wi).
+
+            scalarMultiplierUiAndWi := ScalarToNormalizeDeterminant(listOfUi[1],
+                                                                    d, GF(q));
+            listOfUi := List(listOfUi, Ui -> scalarMultiplierUiAndWi * Ui);
+            listOfWi := List(listOfWi, Wi -> scalarMultiplierUiAndWi * Wi);
+        else
+            # Still m = 2 but now q <> 1 mod 8. Now we cannot rescale Wi and Ui to
+            # determinant 1 since det(Wi) = det(Ui) = -1 and there are no 8th roots
+            # of unity in GF(q).
+
+            # Note that Length(listOfUi) = m = 2, Length(listOfWi) = m - 1 = 1.
+            # Taking these two elements instead of the Ui and Wi should work
+            # according to the Magma code; in particular, they both have
+            # determinant 1.
+            listOfUi := [listOfUi[1] ^ (-1) * listOfUi[2]];
+            listWi := [listOfUi[1] ^ (-1) * listOfWi[1]];
+        fi;
+
+        # Now we deal with the Vi
+
+        # For completeness, we note that p = 3, 7 mod 8 and e odd can
+        # technically not occur here: For e odd we have q = p ^ e = p mod 8 
+        # (since p is odd and therefore p ^ 2 = 1 mod 8) and we require q = 1 mod 4;
+        # hence, we can only have p = 1, 5 mod 8 for e odd.
+        if IsEvenInt(e) or (p - 1) mod 8 = 0 or (p - 3) mod 8 = 0 
+                                             or (p - 7) mod 8 = 0 then
+            # We can still rescale the Vi to determinant 1.
+
+            scalarMultiplierVi := ScalarToNormalizeDeterminant(listOfVi[1],
+                                                           d, GF(q));
+            listOfVi := List(listOfVi, Vi -> scalarMultiplierVi * Vi);
+        else
+            # Now we cannot rescale the Vi to determinant 1. 
+
+            # Note that Length(listOfVi) = m = 2. Taking this one element
+            # instead of the Vi should work according to the Magma code.
+            listOfVi := [listOfVi[1] ^ (-1) * listOfVi[2]];
+        fi;
+    fi;    
+
+    generators := Concatenation([generatingScalar],
+                                generatorsOfNormalizerInGL.listOfXi,
+                                generatorsOfNormalizerInGL.listOfYi,
+                                listOfUi, listOfVi, listOfWi);
+    result := Group(generators);
+    return result;
+
+    # TODO
+    # Set size of result
 end;
 
 # TODO
