@@ -85,7 +85,8 @@ C5SubgroupsSpecialLinearGroupGeneric := function(n, q)
 end;
 
 C6SubgroupsSpecialLinearGroupGeneric := function(n, q)
-    local factorisationOfq, p, e, factorisationOfn, r, m, result;
+    local factorisationOfq, p, e, factorisationOfn, r, m, result,
+    generatorGLMinusSL, numberOfConjugates, extraspecialNormalizerSubgroup;
 
     result := [];
     if not IsPrimePowerInt(n) then
@@ -98,21 +99,46 @@ C6SubgroupsSpecialLinearGroupGeneric := function(n, q)
     factorisationOfn := PrimePowersInt(n);
     r := factorisationOfn[1];
     m := factorisationOfn[2];
+    generatorGLMinusSL := GL(n, q).1;
 
     # Cf. Table 4.6.B and the corresponding definition in [3]
     if IsOddInt(r) then
         if IsOddInt(e) and e = OrderMod(p, r) then
-            Add(result, ExtraspecialNormalizerInSL(r, m, q)); 
+            extraspecialNormalizerSubgroup := ExtraspecialNormalizerInSL(r, m, q);
+            numberOfConjugates := Gcd(n, q - 1);
+            if n = 3 and ((q - 4) mod 9 = 0 or (q - 7) mod 9 = 0) then
+                numberOfConjugates := 1;
+            fi;
+            result := Concatenation(result,
+                                    ConjugatesInGeneralGroup(extraspecialNormalizerSubgroup,
+                                                             generatorGLMinusSL, 
+                                                             numberOfConjugates)); 
         fi;
     elif m >= 2 then
         # n = 2 ^ m >= 4
         if e = 1 and (q - 1) mod 4 = 0 then
-            Add(result, ExtraspecialNormalizerInSL(2, m, q));
+            extraspecialNormalizerSubgroup := ExtraspecialNormalizerInSL(2, m, q);
+            numberOfConjugates := Gcd(n, q - 1);
+            if n = 4 and (q - 5) mod 8 = 0 then
+                numberOfConjugates := 2;
+            fi;
+            result := Concatenation(result,
+                                    ConjugatesInGeneralGroup(extraspecialNormalizerSubgroup,
+                                                             generatorGLMinusSL, 
+                                                             numberOfConjugates));
         fi;
     else
         # n = 2
         if e = 1 and (q - 1) mod 2 = 0 then
-            Add(result, ExtraspecialNormalizerInSL(2, 1, q));
+            extraspecialNormalizerSubgroup := ExtraspecialNormalizerInSL(2, 1, q);
+            if (q - 1) mod 8 = 0 or (q - 7) mod 8 = 0 then
+                result := Concatenation(result,
+                                        ConjugatesInGeneralGroup(extraspecialNormalizerSubgroup,
+                                                                 generatorGLMinusSL,
+                                                                 numberOfConjugates));
+            else
+                Add(result, ExtraspecialNormalizerInSL(2, 1, q));
+            fi;
         fi;
     fi;
 
@@ -182,11 +208,13 @@ function(n, q)
     #                  3.6.3 (n = 7), 3.7.5 (n = 8), 3.8.3 (n = 9),
     #                  3.9.5 (n = 10), 3.10.3 (n = 11), 3.11.7 (n = 12) in [1]
     if not n in [2, 3] then
-        Add(maximalSubgroups, C3SubgroupsSpecialLinearGroupGeneric(n, q));
+        maximalSubgroups := Concatenation(maximalSubgroups, 
+                                          C3SubgroupsSpecialLinearGroupGeneric(n, q));
     elif n = 2 then
         if q <> 7 then
             # Cf. Lemma 3.1.4 in [1]
-            Add(maximalSubgroups, C3SubgroupsSpecialLinearGroupGeneric(2, q));
+            maximalSubgroups := Concatenation(maximalSubgroups, 
+                                              C3SubgroupsSpecialLinearGroupGeneric(2, q));
 
             # TODO
             # original Magma code also has an exception for n = 2 and q = 9,
@@ -197,7 +225,8 @@ function(n, q)
         # n = 3
         if q <> 4 then
             # Cf. Proposition 3.2.3 in [1]
-            Add(maximalSubgroups, C3SubgroupsSpecialLinearGroupGeneric(3, q));
+            maximalSubgroups := Concatenation(maximalSubgroups, 
+                                              C3SubgroupsSpecialLinearGroupGeneric(3, q));
         fi;
     fi;
 
