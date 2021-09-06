@@ -349,7 +349,7 @@ SymplecticTypeNormalizerInSL := function(m, q)
         SetSize(result, 2 ^ 6 * Factorial(6) / 2);
     else
         SetSize(result, 
-                Gcd(q - 1, d) * 2 ^ (2 * m) * Size(SymplecticGroup(2 * m, 2);
+                Gcd(q - 1, d) * 2 ^ (2 * m) * Size(SymplecticGroup(2 * m, 2)));
     fi;
     return result;
 end;
