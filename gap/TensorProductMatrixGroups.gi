@@ -1,7 +1,8 @@
 # Construction as in Proposition 7.1 of [2]
 BindGlobal("TensorProductGroup",
 function(d1, d2, q)
-    local d, c, k, zeta, C, Id1, Id2, gens, SLd1Gens, SLd2Gens, g1, g2, n;
+    local d, c, k, zeta, C, Id1, Id2, gens, SLd1Gens, SLd2Gens,
+    diagonalGenerator1, diagonalGenerator2, solution;
     if not d1 < d2 then
         ErrorNoReturn("<d1> must be less than <d2> but <d1> = ", d1, 
                       " and <d2> = ", d2);
@@ -29,10 +30,10 @@ function(d1, d2, q)
         # Solving the modular congruence d2 * x + d1 * y = 0 mod (q - 1) by
         # solving the matrix equation (d2, d1, q - 1) * (x, y, t) = 0 over the
         # integers.
-        for n in NullspaceMat([[d2], [d1], [q - 1]]) do
+        for solution in NullspaceMat([[d2], [d1], [q - 1]]) do
             Add(gens, 
-                KroneckerProduct(diagonalGenerator1 ^ n[1],
-                                 diagonalGenerator2 ^ n[2]));
+                KroneckerProduct(diagonalGenerator1 ^ solution[1],
+                                 diagonalGenerator2 ^ solution[2]));
         od;
     fi;
 
