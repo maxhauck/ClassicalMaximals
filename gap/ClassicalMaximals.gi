@@ -40,10 +40,10 @@ C2SubgroupsSpecialLinearGroupGeneric := function(n, q)
     divisors := DivisorsInt(n);
     result := [];
     for t in divisors{[2..Length(divisors)]} do
+        # not maximal or considered in class C_1 or C_8 by Proposition
+        # 2.3.6 of [1]
         if (n > 2 and t = n and q <= 4) or (t = n / 2 and q = 2) then
-            continue;
-            # not maximal or considered in class C_1 or C_8 by Proposition
-            # 2.3.6 of [1]
+            continue;  
         fi;
         Add(result, ImprimitivesMeetSL(n, q, t));
     od;
@@ -182,30 +182,19 @@ function(n, q)
         maximalSubgroups := Concatenation(maximalSubgroups,
                                           C2SubgroupsSpecialLinearGroupGeneric(n, q));
     elif n = 2 then
+        # Cf. Lemma 3.1.3 and Theorem 6.3.10 in [1]
         if not q in [5, 7, 9, 11] then
-            # TODO: move this comment and all similar ones in front of the
-            # respective if statement.
-            # Cf. Lemma 3.1.3 and Theorem 6.3.10 in [1]
             Add(maximalSubgroups, ImprimitivesMeetSL(2, q, 2));
-            
-            # TODO
-            # original Magma code also has an exception for n = 2 and q = 11,
-            # but this is not in [1]
-            # --> talk this over with Sergio!!
-            #
-            # Explanation: The propositions in chapter 3 always only talk about
-            # maximality *among the geometric subgroups*. There are additional
-            # containments of some geometric subgroups in subgroups from class
-            # S, which are listed in Theorem 6.3.10
         fi;
     else
         # n = 4
+
+        # Cf. Proposition 3.3.2 in [1]
         if q >= 7 then
-            # Cf. Proposition 3.3.2 in [1]
             Add(maximalSubgroups, ImprimitivesMeetSL(4, q, 4));
         fi;
+        # Cf. Proposition 3.3.3 in [1]
         if q > 3 then
-            # Cf. Proposition 3.3.3 in [1]
             Add(maximalSubgroups, ImprimitivesMeetSL(4, q, 2));
         fi;
     fi;
@@ -218,22 +207,16 @@ function(n, q)
         maximalSubgroups := Concatenation(maximalSubgroups, 
                                           C3SubgroupsSpecialLinearGroupGeneric(n, q));
     elif n = 2 then
+        # Cf. Lemma 3.1.4 and Theorem 6.3.10 in [1]
         if not q in [7, 9] then
-            # Cf. Lemma 3.1.4 and Theorem 6.3.10 in [1]
             maximalSubgroups := Concatenation(maximalSubgroups, 
                                               C3SubgroupsSpecialLinearGroupGeneric(2, q));
-
-            # TODO
-            # original Magma code also has an exception for n = 2 and q = 9,
-            # but this is not in [1]
-            # --> talk this over with Sergio!!
-            #
-            # Explanation: See class C2 above.
         fi;
     else 
         # n = 3
+
+        # Cf. Proposition 3.2.3 in [1]
         if q <> 4 then
-            # Cf. Proposition 3.2.3 in [1]
             maximalSubgroups := Concatenation(maximalSubgroups, 
                                               C3SubgroupsSpecialLinearGroupGeneric(3, q));
         fi;
@@ -249,8 +232,9 @@ function(n, q)
                                           C5SubgroupsSpecialLinearGroupGeneric(n, q));
     else
         # n = 2
+
+        # Cf. Lemma 3.1.5 in [1]
         if  p <> 2 or not IsPrimeInt(e) then
-            # Cf. Lemma 3.1.5 in [1]
             maximalSubgroups := Concatenation(maximalSubgroups,
                                               C5SubgroupsSpecialLinearGroupGeneric(2, q));
         fi;
@@ -262,8 +246,9 @@ function(n, q)
     #                                          3.7.9 (n = 8), 3.8.5 (n = 9), 
     #                                          3.10.3 (n = 11) in [1]
     # For all other n, class C6 is empty.
-    if n <> 2 or not q mod 40 in [11, 19, 21, 29] then
-        # Cf. Theorem 6.3.10 in [1]
+
+    # Cf. Theorem 6.3.10 in [1]
+    if n <> 2 or not q mod 40 in [11, 19, 21, 29] then 
         maximalSubgroups := Concatenation(maximalSubgroups,
                                           C6SubgroupsSpecialLinearGroupGeneric(n, q));
     fi;
