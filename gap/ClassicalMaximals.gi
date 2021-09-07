@@ -183,6 +183,8 @@ function(n, q)
                                           C2SubgroupsSpecialLinearGroupGeneric(n, q));
     elif n = 2 then
         if not q in [5, 7, 9, 11] then
+            # TODO: move this comment and all similar ones in front of the
+            # respective if statement.
             # Cf. Lemma 3.1.3 and Theorem 6.3.10 in [1]
             Add(maximalSubgroups, ImprimitivesMeetSL(2, q, 2));
             
