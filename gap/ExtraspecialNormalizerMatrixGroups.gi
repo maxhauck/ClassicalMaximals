@@ -258,7 +258,7 @@ end;
 SymplecticTypeNormalizerInSL := function(m, q)
     local generatorsOfNormalizerInGL, d, listOfUi, listOfVi, listOfWi,
     generatingScalar, scalarMultiplierVi, scalarMultiplierUiAndWi, p, e, 
-    factorization, generators, result, zeta;
+    factorization, generators, result, zeta, U1InGL;
     
     if (q - 1) mod 4 <> 0 or m < 2 then
         ErrorNoReturn("<q> must be 1 mod 4 and <m> must be at least 2 but <q> = ",
@@ -319,8 +319,9 @@ SymplecticTypeNormalizerInSL := function(m, q)
 
         # Taking these elements instead of the Ui, Wi, Vi should suffice
         # according to the Magma code; note that they all have determinant 1.
+        U1InGL := listOfUi[1];
         listOfUi := [listOfUi[1] ^ (-1) * listOfUi[2]];
-        listOfWi := [listOfUi[1] ^ (-1) * listOfWi[1]];
+        listOfWi := [U1InGL ^ (-1) * listOfWi[1]];
         listOfVi := [listOfVi[1] ^ (-1) * listOfVi[2]];
     fi;
     generators := Concatenation([generatingScalar],
@@ -329,17 +330,13 @@ SymplecticTypeNormalizerInSL := function(m, q)
                                 listOfUi, listOfVi, listOfWi);
     result := Group(generators);
 
-    # TODO
-    # The size of the result in the case d = 4 (i.e. m = 2) and q = 5 mod 8
-    # does not agree with what one might expect give Table 2.9 of [1]
-
     # Size according to Table 2.9 of [1]
-    # if d = 4 and (q - 5) mod 8 = 0 then
-    #     SetSize(result, 2 ^ 6 * Factorial(6) / 2);
-    # else
-    #     SetSize(result, 
-    #             Gcd(q - 1, d) * 2 ^ (2 * m) * Size(SymplecticGroup(2 * m, 2)));
-    # fi;
+    if d = 4 and (q - 5) mod 8 = 0 then
+        SetSize(result, 2 ^ 6 * Factorial(6) / 2);
+    else
+        SetSize(result, 
+                Gcd(q - 1, d) * 2 ^ (2 * m) * Size(SymplecticGroup(2 * m, 2)));
+    fi;
     return result;
 end;
 
