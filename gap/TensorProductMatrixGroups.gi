@@ -1,8 +1,8 @@
 # Construction as in Proposition 7.1 of [2]
-BindGlobal("TensorProductGroup",
+BindGlobal("TensorProductStabilizerInSL",
 function(d1, d2, q)
-    local d, c, k, zeta, C, Id1, Id2, gens, SLd1Gens, SLd2Gens,
-    diagonalGenerator1, diagonalGenerator2, solution;
+    local d, c, k, g, zeta, C, Id1, Id2, gens, SLd1Gens, SLd2Gens,
+    diagonalGenerator1, diagonalGenerator2, solution, result;
     if not d1 < d2 then
         ErrorNoReturn("<d1> must be less than <d2> but <d1> = ", d1, 
                       " and <d2> = ", d2);
@@ -10,7 +10,8 @@ function(d1, d2, q)
 
     d := d1 * d2;
     k := Gcd(d, q - 1);
-    c := QuoInt(Gcd(d1, q - 1) * Gcd(d2, q - 1) * Gcd(d1, d2, q - 1), k);
+    g := Gcd(d1, d2, q - 1);
+    c := QuoInt(Gcd(d1, q - 1) * Gcd(d2, q - 1) * g, k);
     zeta := PrimitiveElement(GF(q));
     C := zeta^(QuoInt((q - 1), k)) * IdentityMat(d, GF(q)); # generates the center of SL(d, q)
     Id1 := One(SL(d1 ,q));
@@ -30,12 +31,14 @@ function(d1, d2, q)
         # Solving the modular congruence d2 * x + d1 * y = 0 mod (q - 1) by
         # solving the matrix equation (d2, d1, q - 1) * (x, y, t) = 0 over the
         # integers.
-        for solution in NullspaceMat([[d2], [d1], [q - 1]]) do
+        for solution in NullspaceIntMat([[d2], [d1], [q - 1]]) do
             Add(gens, 
                 KroneckerProduct(diagonalGenerator1 ^ solution[1],
                                  diagonalGenerator2 ^ solution[2]));
         od;
     fi;
 
-    return Group(gens);
+    result := Group(gens);
+    SetSize(result, QuoInt(Size(SL(d1, q)) * Size(SL(d2, q)), (q - 1)) * g^2);
+    return result;
 end);
