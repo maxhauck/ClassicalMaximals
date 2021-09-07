@@ -1,3 +1,6 @@
+# TODO
+# FIX TESTS
+
 # Construction as in Proposition 7.1 of [2]
 BindGlobal("TensorProductStabilizerInSL",
 function(d1, d2, q)
