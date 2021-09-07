@@ -1,7 +1,3 @@
-gap> d1 := 1;; d2 := 2;; q := 2;;
-gap> G := TensorProductStabilizerInSL(d1, d2, q);;
-gap> Size(Group(GeneratorsOfGroup(G))) = Size(G);
-true
 gap> d1 := 2;; d2 := 3;; q := 2;;
 gap> G := TensorProductStabilizerInSL(d1, d2, q);;
 gap> Size(Group(GeneratorsOfGroup(G))) = Size(G);
