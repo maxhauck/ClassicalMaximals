@@ -130,10 +130,6 @@ C6SubgroupsSpecialLinearGroupGeneric := function(n, q)
     else
         # n = 2
         if e = 1 and (q - 1) mod 2 = 0 then
-            if q mod 40 in [11, 19, 21, 29] then
-                # Cf. Theorem 6.3.10 in [1]
-                return result;
-            fi;
             extraspecialNormalizerSubgroup := ExtraspecialNormalizerInSL(2, 1, q);
             if (q - 1) mod 8 = 0 or (q - 7) mod 8 = 0 then
                 result := Concatenation(result,
@@ -264,8 +260,11 @@ function(n, q)
     #                                          3.7.9 (n = 8), 3.8.5 (n = 9), 
     #                                          3.10.3 (n = 11) in [1]
     # For all other n, class C6 is empty.
-    maximalSubgroups := Concatenation(maximalSubgroups,
-                                      C6SubgroupsSpecialLinearGroupGeneric(n, q));
+    if n <> 2 or not q mod 40 in [11, 19, 21, 29] then
+        # Cf. Theorem 6.3.10 in [1]
+        maximalSubgroups := Concatenation(maximalSubgroups,
+                                          C6SubgroupsSpecialLinearGroupGeneric(n, q));
+    fi;
 
     return maximalSubgroups;
 end);
