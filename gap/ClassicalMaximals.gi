@@ -162,7 +162,9 @@ end;
 
 C7SubgroupsSpecialLinearGroupGeneric := function(n, q)
     local m, t, factorisationOfn, factorisationOfnExponents, highestPowern,
-    result;
+    result, divisorsHighestPowern;
+
+    result := [];
     factorisationOfn := PrimePowersInt(n);
     # get all exponents of prime factorisation of n
     factorisationOfnExponents := factorisationOfn{Filtered([1..Length(factorisationOfn)], 
@@ -170,8 +172,9 @@ C7SubgroupsSpecialLinearGroupGeneric := function(n, q)
     # n can be written as k ^ highestPowern with k an integer and highestPowern
     # is maximal with this property
     highestPowern := Gcd(factorisationOfnExponents);
-
-    for t in DivisorsInt(highestPowern){[2..Length(highestPowern)]} do
+    
+    divisorsHighestPowern := DivisorsInt(highestPowern);
+    for t in divisorsHighestPowern{[2..Length(divisorsHighestPowern)]} do
         m := RootInt(n, t);
         Add(result, TensorInducedDecompositionStabilizerInSL(m, t, q)); 
     od;
