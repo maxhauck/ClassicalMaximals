@@ -42,6 +42,6 @@ function(d1, d2, q)
     fi;
 
     result := Group(gens);
-    SetSize(result, QuoInt(Size(SL(d1, q)) * Size(SL(d2, q)), (q - 1)) * g^2);
+    SetSize(result, Size(SL(d1, q)) * Size(SL(d2, q)) * g);
     return result;
 end);
