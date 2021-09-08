@@ -63,15 +63,14 @@ C4SubgroupsSpecialLinearGroupGeneric := function(n, q)
     local divisorListOfn, result, n1;
     divisorListOfn := List(DivisorsInt(n));
     Remove(divisorListOfn, 1);
+    divisorListOfn := Filtered(divisorListOfn, x -> x < n / x);
+    # Cf. Proposition 2.3.22
+    if q = 2 and 2 in divisorListOfn then
+        Remove(divisorListOfn, 2);
+    fi;
     result := [];
     for n1 in divisorListOfn do
-        if n1^2 >= n then
-            break;
-        fi;
-        # Cf. Proposition 2.3.22
-        if not n1 = 2 and q = 2 then
-            Add(result, TensorProductStabilizerInSL(n1, QuoInt(n, n1), q));
-        fi;
+        Add(result, TensorProductStabilizerInSL(n1, QuoInt(n, n1), q));
     od;
     return result;
 end;
@@ -161,10 +160,29 @@ C6SubgroupsSpecialLinearGroupGeneric := function(n, q)
     return result;
 end;
 
+C7SubgroupsSpecialLinearGroupGeneric := function(n, q)
+    local m, t, factorisationOfn, factorisationOfnExponents, highestPowern,
+    result;
+    factorisationOfn := PrimePowersInt(n);
+    # get all exponents of prime factorisation of n
+    factorisationOfnExponents := factorisationOfn{Filtered([1..Length(factorisationOfn)], 
+                                                  IsEvenInt)};
+    # n can be written as k ^ highestPowern with k an integer and highestPowern
+    # is maximal with this property
+    highestPowern := Gcd(factorisationOfnExponents);
+
+    for t in DivisorsInt(highestPowern){[2..Length(highestPowern)]} do
+        m := RootInt(n, t);
+        Add(result, TensorInducedDecompositionStabilizerInSL(m, t, q)); 
+    od;
+
+    return result;
+end;
+
 InstallGlobalFunction(MaximalSubgroupClassRepsSpecialLinearGroup,
 function(n, q)
-    local maximalSubgroups, primeDivisorsOfe, factorisation, p, e, generatorGLMinusSL, degreeOfExtension, f,
-    numberOfConjugates, subfieldGroup;
+    local maximalSubgroups, primeDivisorsOfe, factorisation, p, e, generatorGLMinusSL, 
+    degreeOfExtension, f, numberOfConjugates, subfieldGroup;
 
     maximalSubgroups := [];
 
@@ -241,6 +259,7 @@ function(n, q)
     # Class C4 subgroups ######################################################
     # Cf. Propositions 3.5.6 (n = 6), 3.7.7 (n = 8), 3.9.6 (n = 10), 
     #                  3.11.8 (n = 12) in [1]
+    # For all other n, class C4 is empty.
     maximalSubgroups := Concatenation(maximalSubgroups,
                                       C4SubgroupsSpecialLinearGroupGeneric(n, q));
 
@@ -274,6 +293,12 @@ function(n, q)
         maximalSubgroups := Concatenation(maximalSubgroups,
                                           C6SubgroupsSpecialLinearGroupGeneric(n, q));
     fi;
+
+    # Class C7 subgroups ######################################################
+    # Cf. Proposition 3.8.6 in [1]
+    # For all other n, class C7 is empty.
+    maximalSubgroups := Concatenation(maximalSubgroups,
+                                      C7SubgroupsSpecialLinearGroupGeneric(n, q));
 
     return maximalSubgroups;
 end);
