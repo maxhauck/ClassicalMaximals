@@ -67,8 +67,11 @@ C4SubgroupsSpecialLinearGroupGeneric := function(n, q)
     for n1 in divisorListOfn do
         if n1^2 >= n then
             break;
-        fi; 
-        Add(result, TensorProductStabilizerInSL(n1, QuoInt(n, n1), q));
+        fi;
+        # Cf. Proposition 2.3.22
+        if not n1 = 2 and q = 2 then
+            Add(result, TensorProductStabilizerInSL(n1, QuoInt(n, n1), q));
+        fi;
     od;
     return result;
 end;
@@ -234,6 +237,12 @@ function(n, q)
                                               C3SubgroupsSpecialLinearGroupGeneric(3, q));
         fi;
     fi;
+
+    # Class C4 subgroups ######################################################
+    # Cf. Propositions 3.5.6 (n = 6), 3.7.7 (n = 8), 3.9.6 (n = 10), 
+    #                  3.11.8 (n = 12) in [1]
+    maximalSubgroups := Concatenation(maximalSubgroups,
+                                      C4SubgroupsSpecialLinearGroupGeneric(n, q));
 
     # Class C5 subgroups ######################################################
     # Cf. Propositions 3.2.4 (n = 3), 3.3.5 (n = 4), 3.4.3 (n = 5), 
