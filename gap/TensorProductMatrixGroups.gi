@@ -1,6 +1,3 @@
-# TODO
-# FIX TESTS
-
 # Construction as in Proposition 7.1 of [2]
 BindGlobal("TensorProductStabilizerInSL",
 function(d1, d2, q)
@@ -42,6 +39,7 @@ function(d1, d2, q)
     fi;
 
     result := Group(gens);
+    # Size according to Table 2.7 in [1]
     SetSize(result, Size(SL(d1, q)) * Size(SL(d2, q)) * g);
     return result;
 end);

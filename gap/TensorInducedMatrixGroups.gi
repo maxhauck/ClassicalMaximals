@@ -81,8 +81,15 @@ BindGlobal("TensorInducedDecompositionStabilizerInSL",
 function(m, t, q)
     local gensOfSLm, I, D, C, generatorsOfHInSL, gens, i, H, E, U, S, zeta, mu,
     result, scalingMatrix, d, generator;
-    if not t > 1 or not m > 2 then
-        ErrorNoReturn("<t> must be greater than 1 and <m> must be greater than 2 but <t> = ", 
+
+    # TODO
+    # The constructions for the maximal subgroups require m >= 3 in case L, but
+    # the corresponding Magma function also worked for m = 2 -- maybe keep 
+    # m = 2 because it might be useful later on? 
+    # --> Talk this over with Sergio
+
+    if not t > 1 or not m > 1 then
+        ErrorNoReturn("<t> must be greater than 1 and <m> must be greater than 1 but <t> = ", 
                       t, " and <m> = ", m);
     fi;
 
@@ -152,6 +159,14 @@ function(m, t, q)
 
     gens := Concatenation(generatorsOfHInSL, [C, U, S * E]);
     result := Group(gens);
+    # Size according to Table 2.10 of [1]
+    if t = 2 and m mod 4 = 2 and q mod 4 = 3 then
+        SetSize(result, Gcd(q - 1, m) * Size(PSL(m, q)) ^ 2 * Gcd(q - 1, m) ^ 2);
+    else
+        SetSize(result, Gcd(q - 1, m) * Size(PSL(m, q)) ^ t 
+                                      * Gcd(q - 1, m ^ (t - 1)) * Gcd(q - 1, m) ^ (t - 1) 
+                                      * Factorial(t));
+    fi;
     return result;
 end);
 
