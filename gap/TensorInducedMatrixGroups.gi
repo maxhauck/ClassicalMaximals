@@ -1,47 +1,19 @@
-# Construction as in Lemma 10.1 of [2]
-# TensorWreathProduct := function(H, K)
-#     local A, i, d, t, m, field, symt, gens, generator, tensorProductBasis,
-#     permuteTensorProductBasisElements, permutation;
-#     m := Length(One(H));
-#     field := DefaultFieldOfMatrixGroup(H);
-#     t := LargestMovedPoint(K);
-#     symt := SymmetricGroup(t);
-#     d := m ^ t;
-#     gens := [];
-#     for A in GeneratorsOfGroup(H) do
-#         generator := A;
-#         for i in [1..t - 1] do
-#             generator := KroneckerProduct(generator, IdentityMat(m, field));
-#         od;
-#         Add(gens, generator);
-#     od;
-# 
-#     # Reverse to be consistent with Magma
-#     tensorProductBasis := List(Tuples([1..m], t), Reversed);
-#     permuteTensorProductBasisElements := ActionHomomorphism(symt,
-#                                                             tensorProductBasis, 
-#                                                             Permuted, 
-#                                                             "surjective");
-#     
-#     
-#     for permutation in GeneratorsOfGroup(K) do
-#         generator := PermutationMat(Image(permuteTensorProductBasisElements,
-#                                           permutation), 
-#                                     d, field);
-#         Add(gens, generator);
-#     od;
-#     return Group(gens);
-# end;
-
-
-######################## WORKING OUT FOR LEFTOVER CASE BELOW ##################
+######################## WORKING OUT FOR ELSE BRANCH BELOW ####################
 #
-#     Working with the construction of TensorWreathProduct(SL(m, q), Sym(t)) 
-#     from the function above, we have:
+#     Let m be even and assume that a generator of the
+#     TensorWreathProduct(SL(m, q), Sym(t)) has determinant not equal to 1.
 #
-#     psi : Sym(t) --> Sym(m ^ t)
-#     PermutationMat : Sym(m ^ t) --> GL(m ^ t, q)
-#     GeneratorsOfGroup(K) = {(1, 2), (1, 2, 3, ..., t)}
+#     We generate TensorWreathProduct(SL(m, q), Sym(t)) from 
+#       * (m - 1)-fold Kronecker products of the generators of SL(m, q) with 
+#         mxm identity matrices 
+#       * permutation matrices constructed in the following way: the group
+#         Sym(t) acts naturally on the set Omega of t-tuples over [1..m] giving
+#         a homomorphism psi : Sym(t) --> Sym(m ^ t); we take the permutation
+#         matrices associated to the images of the generators of Sym(t) under
+#         the homomorphism psi
+#     The first class of generators obviously always has determinant 1, the
+#     second class has determinant +-1. We take (1, 2) and (1, 2, 3, ..., t) as
+#     generators of Sym(t).
 #
 #     psi((1, 2)) is a product of m * (m - 1) / 2 * m ^ (t - 2) cycles of length 2 
 #     (for any two different a1, a2 in [1..m] and any a3, ..., at in [1..m] the 
@@ -65,13 +37,17 @@
 #
 #               B_{t / d} = sum_{e | d} mu(d / e) * m ^ e = 0 mod 2
 #
-#     since m is even for all d. But decomposing psi((1, 2, ..., t)) into a
-#     product of cycles gives exactly B_{t / d} cycles of length d. Therefore
+#     since m is even for all d (this can also be seen without the Mobius
+#     inversion formula by induction). But decomposing psi((1, 2, ..., t)) into
+#     a product of cycles gives exactly B_{t / d} cycles of length d. Therefore
 #     det(PermutationMat(phi((1, 2, ..., t)))) = sign(psi((1, 2, ..., t)))
 #                                              = 1.
 #
 #     Conclusion: If m is even and we have a generator of determinant -1, then
-#     t = 2 and m = 2 mod 4. 
+#     t = 2 and m = 2 mod 4. It then follows that in the else branch below, we
+#     must have q = 1 mod 4: The case t = 2, m = 2 mod 4 and q = 3 mod 4 was
+#     filtered out in an if-statement before and the case q even will always
+#     give determinant 1 as -1 = 1 in characteristic 2.
 #
 ###############################################################################     
 
@@ -81,13 +57,6 @@ BindGlobal("TensorInducedDecompositionStabilizerInSL",
 function(m, t, q)
     local gensOfSLm, I, D, C, generatorsOfHInSL, gens, i, H, E, U, S, zeta, mu,
     result, scalingMatrix, d, generator;
-
-    # TODO
-    # The constructions for the maximal subgroups require m >= 3 in case L, but
-    # the corresponding Magma function also worked for m = 2 -- maybe keep 
-    # m = 2 because it might be useful later on? 
-    # --> Talk this over with Sergio
-
     if not t > 1 or not m > 1 then
         ErrorNoReturn("<t> must be greater than 1 and <m> must be greater than 1 but <t> = ", 
                       t, " and <m> = ", m);
@@ -122,9 +91,6 @@ function(m, t, q)
                 else
                     # In this case, we have t = 2, m = 2 mod 4 and q = 1 mod 4
                     # (see working out above).
-                    #
-                    # TODO
-                    # --> Ask Sergio in how much detail to explain this
 
                     # This has determinant ((det D) ^ ((q - 1) / 4)) ^ m 
                     # = (zeta ^ ((q - 1) / 4)) ^ m, which, using m even,
