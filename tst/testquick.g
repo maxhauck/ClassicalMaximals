@@ -6,7 +6,7 @@
 #
 LoadPackage( "ClassicalMaximals" );
 
-TestDirectory(DirectoriesPackageLibrary( "ClassicalMaximals", "tst" ),
+TestDirectory(DirectoriesPackageLibrary( "ClassicalMaximals", "tst/quick/" ),
   rec(exitGAP := true));
 
 FORCE_QUIT_GAP(1); # if we ever get here, there was an error
