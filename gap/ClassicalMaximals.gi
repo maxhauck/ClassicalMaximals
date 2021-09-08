@@ -59,6 +59,20 @@ C3SubgroupsSpecialLinearGroupGeneric := function(n, q)
     return result;
 end;
 
+C4SubgroupsSpecialLinearGroupGeneric := function(n, q)
+    local divisorListOfn, result, n1;
+    divisorListOfn := List(DivisorsInt(n));
+    Remove(divisorListOfn, 1);
+    result := [];
+    for n1 in divisorListOfn do
+        if n1^2 >= n then
+            break;
+        fi; 
+        Add(result, TensorProductStabilizerInSL(n1, QuoInt(n, n1), q));
+    od;
+    return result;
+end;
+
 C5SubgroupsSpecialLinearGroupGeneric := function(n, q)
     local factorisation, p, e, generatorGLMinusSL, primeDivisorsOfe,
     degreeOfExtension, f, subfieldGroup, numberOfConjugates, result;
