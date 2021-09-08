@@ -22,8 +22,7 @@ function(type, n, q)
     if type = "L" then
         return MaximalSubgroupClassRepsSpecialLinearGroup(n, q);
     fi;
-
-    return 0;
+    ErrorNoReturn("not yet implemented");
 end);
 
 C1SubgroupsSpecialLinearGroupGeneric := function(n, q)
