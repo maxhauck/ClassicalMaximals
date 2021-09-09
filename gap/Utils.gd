@@ -11,3 +11,6 @@
 #! length <C>nrRows * nrCols</C>, the elements of <A>entries</A> will be
 #! written into the matrix row by row.
 DeclareGlobalFunction("MatrixByEntries");
+
+DeclareGlobalFunction("ChangeFixedSesquilinearForm");
+DeclareGlobalFunction("AntidiagonalMat");

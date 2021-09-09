@@ -26,9 +26,9 @@ function(group, gramMatrix)
     gapForm := PreservedSesquilinearForms(group)[1];
     field := BaseField(gapForm);
     if IsBilinearForm(gapForm) then
-        newForm := BilinearFormByMatrix(gramMatrix);
+        newForm := BilinearFormByMatrix(gramMatrix, field);
     elif IsHermitianForm(gapForm) then
-        newForm := HermitianFormByMatrix(gramMatrix);
+        newForm := HermitianFormByMatrix(gramMatrix, field);
     fi;
     # the following if condition can only ever be fulfilled if <group> is an
     # orthogonal group; there the case of even dimension is problematic since,
