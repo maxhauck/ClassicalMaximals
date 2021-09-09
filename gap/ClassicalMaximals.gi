@@ -13,6 +13,11 @@
 # Implementations
 #
 
+# For most classes of subgroups, we have to conjugate the subgroups we
+# determined by an element C from the general group, which is not in the
+# special (or quasisimple) group, in order to get representatives for all
+# conjugacy classes in the special (or quasisimple) group, not only for the
+# conjugacy classes in the general group (which are generally larger).
 ConjugatesInGeneralGroup := function(S, C, r)
     return List([0..r - 1], i -> S ^ (C ^ i));
 end;
@@ -60,7 +65,9 @@ C3SubgroupsSpecialLinearGroupGeneric := function(n, q)
 end;
 
 C4SubgroupsSpecialLinearGroupGeneric := function(n, q)
-    local divisorListOfn, result, n1;
+    local divisorListOfn, result, n1, numberOfConjugates, generatorGLMinusSL,
+    tensorProductSubgroup;
+    
     divisorListOfn := List(DivisorsInt(n));
     Remove(divisorListOfn, 1);
     divisorListOfn := Filtered(divisorListOfn, x -> x < n / x);
@@ -69,9 +76,17 @@ C4SubgroupsSpecialLinearGroupGeneric := function(n, q)
         Remove(divisorListOfn, 2);
     fi;
     result := [];
+    
+    generatorGLMinusSL := GL(n, q).1;
     for n1 in divisorListOfn do
-        Add(result, TensorProductStabilizerInSL(n1, QuoInt(n, n1), q));
+        tensorProductSubgroup := TensorProductStabilizerInSL(n1, QuoInt(n, n1), q);
+        numberOfConjugates := Gcd([q - 1, n1, QuoInt(n, n1)]);
+        result := Concatenation(result,
+                                ConjugatesInGeneralGroup(tensorProductSubgroup, 
+                                                         generatorGLMinusSL,
+                                                         numberOfConjugates));
     od;
+
     return result;
 end;
 
@@ -162,9 +177,11 @@ end;
 
 C7SubgroupsSpecialLinearGroupGeneric := function(n, q)
     local m, t, factorisationOfn, factorisationOfnExponents, highestPowern,
-    result, divisorsHighestPowern;
+    result, divisorsHighestPowern, numberOfConjugates, tensorInducedSubgroup, 
+    generatorGLMinusSL;
 
     result := [];
+    generatorGLMinusSL := GL(n, q).1;
     factorisationOfn := PrimePowersInt(n);
     # get all exponents of prime factorisation of n
     factorisationOfnExponents := factorisationOfn{Filtered([1..Length(factorisationOfn)], 
@@ -176,7 +193,15 @@ C7SubgroupsSpecialLinearGroupGeneric := function(n, q)
     divisorsHighestPowern := DivisorsInt(highestPowern);
     for t in divisorsHighestPowern{[2..Length(divisorsHighestPowern)]} do
         m := RootInt(n, t);
-        Add(result, TensorInducedDecompositionStabilizerInSL(m, t, q)); 
+        tensorInducedSubgroup := TensorInducedDecompositionStabilizerInSL(m, t, q);
+        numberOfConjugates := Gcd(q - 1, m ^ (t - 1));
+        if m mod 4 = 2 and t = 2 and q mod 4 = 3 then
+            numberOfConjugates := QuoInt(numberOfConjugates, 2);
+        fi;
+        result := Concatenation(result, 
+                                ConjugatesInGeneralGroup(tensorInducedSubgroup,
+                                                         generatorGLMinusSL, 
+                                                         numberOfConjugates));
     od;
 
     return result;
