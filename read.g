@@ -11,6 +11,5 @@ ReadPackage( "ClassicalMaximals", "gap/SubfieldMatrixGroups.gi");
 ReadPackage( "ClassicalMaximals", "gap/ExtraspecialNormalizerMatrixGroups.gi");
 ReadPackage( "ClassicalMaximals", "gap/TensorProductMatrixGroups.gi");
 ReadPackage( "ClassicalMaximals", "gap/TensorInducedMatrixGroups.gi");
-ReadPackage( "ClassicalMaximals", "gap/ClassicalMatrixGroupsSymplectic.gi");
-ReadPackage( "ClassicalMaximals", "gap/ClassicalMatrixGroupsUnitary.gi");
+ReadPackage( "ClassicalMaximals", "gap/ClassicalNormalizerSubgroups.gi");
 ReadPackage( "ClassicalMaximals", "gap/ClassicalMaximals.gi");
