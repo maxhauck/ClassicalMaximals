@@ -22,3 +22,35 @@ gap> n := 4;; q := 4;;
 gap> G := UnitaryNormalizerInSL(n, q);;
 gap> Size(Group(GeneratorsOfGroup(G))) = Size(G);
 true
+gap> epsilon := 0;; n := 3;; q := 5;;
+gap> G := OrthogonalNormalizerInSL(epsilon, n, q);;
+gap> Size(Group(GeneratorsOfGroup(G))) = Size(G);
+true
+gap> epsilon := -1;; n := 2;; q := 3;;
+gap> G := OrthogonalNormalizerInSL(epsilon, n, q);;
+gap> Size(Group(GeneratorsOfGroup(G))) = Size(G);
+true
+gap> epsilon := 1;; n := 2;; q := 3;;
+gap> G := OrthogonalNormalizerInSL(epsilon, n, q);;
+gap> Size(Group(GeneratorsOfGroup(G))) = Size(G);
+true
+gap> epsilon := -1;; n := 4;; q := 5;;
+gap> G := OrthogonalNormalizerInSL(epsilon, n, q);;
+gap> Size(Group(GeneratorsOfGroup(G))) = Size(G);
+true
+gap> epsilon := 1;; n := 4;; q := 5;;
+gap> G := OrthogonalNormalizerInSL(epsilon, n, q);;
+gap> Size(Group(GeneratorsOfGroup(G))) = Size(G);
+true
+gap> epsilon := -1;; n := 4;; q := 3;;
+gap> G := OrthogonalNormalizerInSL(epsilon, n, q);;
+gap> Size(Group(GeneratorsOfGroup(G))) = Size(G);
+true
+gap> epsilon := 1;; n := 4;; q := 3;;
+gap> G := OrthogonalNormalizerInSL(epsilon, n, q);;
+gap> Size(Group(GeneratorsOfGroup(G))) = Size(G);
+true
+gap> epsilon := -1;; n := 2;; q := 5;;
+gap> G := OrthogonalNormalizerInSL(epsilon, n, q);;
+gap> Size(Group(GeneratorsOfGroup(G))) = Size(G);
+true

@@ -33,9 +33,8 @@ function(group, gramMatrix)
     # the following if condition can only ever be fulfilled if <group> is an
     # orthogonal group; there the case of even dimension is problematic since,
     # in that case, there are two similarity classes of bilinear forms
-    if not IsometricCanonicalForm(gapForm) = IsometricCanonicalForm(newForm)
-       and IsEvenInt(DimensionOfMatrixGroup(group)) then
-       ErrorNoReturn("The form preserved by <group> must be similar to the form", 
+    if not WittIndex(gapForm) = WittIndex(newForm) then
+       ErrorNoReturn("The form preserved by <group> must be similar to the form ", 
                      "described by the Gram matrix <gramMatrix>.");
     fi;
     gapToCanonical := BaseChangeHomomorphism(BaseChangeToCanonical(gapForm), 
