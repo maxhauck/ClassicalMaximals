@@ -165,16 +165,14 @@ GeneratorsOfOrthogonalGroup := function(epsilon, n, q)
     return rec(generatorsOfSO := generatorsOfSO, D := D, E := E);
 end;
 
-# TODO
-# Fix this - not only does the W calculated not always have order 2 mod 
-# Z(SL(d, q)).SO(d, q), but it also seems to be quite problematic that W is in
-# most cases not even an element of SL(d, q). What the heck!?
-
 # Construction as in Proposition 11.2 of [2]
+# Note, though, that the construction of the matrix W as in Proposition 8.4 of
+# [2] does not lead to correct results here - we provide our own construction
+# here instead.
 BindGlobal("OrthogonalNormalizerInSL",
 function(epsilon, d, q)
-    local generatingScalar, omega, generatorsOfOrthogonalGroup, generators,
-    result, k, zeta, i1, DEpsilon, EEpsilon, E, X, W, m, i2, n, i3;
+    local generatingScalar, zeta, generatorsOfOrthogonalGroup, generators,
+    result, i1, DEpsilon, EEpsilon, X, W, i2, k;
     if IsEvenInt(q) then
         ErrorNoReturn("<q> must be an odd integer but <q> = ", q);
     fi;
@@ -182,10 +180,8 @@ function(epsilon, d, q)
         ErrorNoReturn("This function might not work with <d> <= 2 but <d> = ", d);
     fi;
 
-    zeta := PrimitiveElement(GF(q ^ 2));
-    omega := PrimitiveElement(GF(q));
-
-    generatingScalar := omega ^ QuoInt(q - 1, Gcd(q - 1, d)) * IdentityMat(d, GF(q));
+    zeta := PrimitiveElement(GF(q));
+    generatingScalar := zeta ^ QuoInt(q - 1, Gcd(q - 1, d)) * IdentityMat(d, GF(q));
     generatorsOfOrthogonalGroup := GeneratorsOfOrthogonalGroup(epsilon, d, q);
     # These are A_epsilon, B_epsilon and C in [2]
     generators := Concatenation(generatorsOfOrthogonalGroup.generatorsOfSO,
@@ -199,48 +195,53 @@ function(epsilon, d, q)
         DEpsilon := generatorsOfOrthogonalGroup.D;
         # det(EEpsilon) = (epsilon * omega) ^ (d / 2)
         EEpsilon := generatorsOfOrthogonalGroup.E;
-        k := Gcd(q + 1, d);
-        X := zeta * IdentityMat(d, GF(q ^ 2));
-        # det(E) = omega ^ (d / 2) * zeta ^ (-d) 
-        #        = zeta ^ (d(q - 1) / 2) using omega = zeta ^ (q + 1)
-        E := EEpsilon * X ^ (-1);
+        X := zeta * IdentityMat(d, GF(q));
+        k := Gcd(q - 1, d);
 
         # We deal with the cases epsilon = +1 and epsilon = -1 simultaneously
-        if IsEvenInt((q + 1) / k) then
-            i1 := QuoInt(q ^ 2 - 1, 2 * k);
-            # det(X ^ i1) = -1 and det(DEpsilon) = -1, hence det(W) = 1.
-            # Notice W not in Z(SL(d, q)).SO(d, q) - for suppose otherwise,
-            # then there is a scalar S with det(S) = 1 and SW in SO(d, q), i.e. 
-            # gramMatrix = SW * gramMatrix * (SW) ^ T 
-            #            = S * X ^ i1 * (DEpsilon * gramMatrix * DEpsilon ^ T) * X ^ i1 * S 
-            #            = (S * X ^ i1) ^ 2 * gramMatrix,
-            # i.e. S * X ^ i1 = +- the identity and hence det(S) = -1, a
-            # contradiction. Furthermore, W ^ 2 = X ^ (2 * i1) * DEpsilon ^ 2, 
-            # i.e. a scalar of determinant 1 times an element of SO(d, q).
+        if IsEvenInt((q - 1) / k) then
+            i1 := QuoInt(q - 1, 2 * k);
+            # Note that det(X ^ i1) = zeta ^ (d * (q - 1) / 2 * k) 
+            #                       = zeta ^ (Lcm(d, q - 1) / 2)
+            #                       = -1
+            # since the 2-adic valuation of q - 1 is greater than the 2-adic
+            # valuation of d, hence det(W) = 1. Obviously, W ^ 2 is in 
+            # Z(SL(d, q)).SO(d, q). Suppose W were already in that group; then
+            # there is a scalar S with S * W in SO(d, q) implying
+            # S * X ^ i1 * DEpsilon * gramMatrix * DEpsilon ^ T * X ^ i1 * S 
+            # = gramMatrix - but the LHS is (S * X ^ i1) ^ 2 * gramMatrix,
+            # which means S = +- X ^ (-i1), which is not in SL - contradiction. 
             W := X ^ i1 * DEpsilon;
-        elif IsEvenInt(d / k) then
-            m := (q + 1) / k;
-            i2 := (q - 1) * (m + 1) / 2;
-            # det(X ^ i2) = zeta ^ (d(q - 1) / 2) = det(E), hence det(W) = 1.
-            # A similar calculation to the previous case shows that W has
-            # indeed order 2 mod Z(SL(d, q)).SO(d, q).
-            W := E * X ^ (-i2);
-        else
-            m := d / k;
-            # Note (m, (q + 1) / k) = 1 since k = (q + 1, d) and m = d / k.
-            n := 1 / m mod ((q + 1) / k);
-            i3 := (q - 1) * n * (d + q + 1) / (2 * k);
-            # An easy, but tedious calculation shows det(X ^ i3) =
-            # det(DEpsilon * E) = zeta ^ ((d + q + 1)(q - 1) / 2), hence
-            # det(W) = 1. 
-            W := DEpsilon * E * X ^ (-i3);
-            if epsilon = -1 and IsOddInt(d / 2) then
-                # If epsilon = -1 and d / 2 is odd, we have 
-                # det(EEpsilon) = (-omega) ^ (d / 2) <> omega ^ (d / 2)
-                # and thus we need to distinguish this final case. Since
-                # det(DEpsilon) = -1, we achieve det(W) = 1 by leaving out the
-                # factor DEpsilon.
-                W := E * X ^ (-i3);
+        else 
+            i2 := ((q - 1) / k - 1) / 2; # an integer since (q - 1) / k is odd
+            if IsEvenInt(d / k) or (epsilon = -1 and IsOddInt(d / 2)) then
+                # Note that det(X ^ i2) = zeta ^ (d * ((q - 1) / k - 1) / 2)
+                #                       = zeta ^ (d * (q - 1)) / (2 * k) * zeta ^ (- d / 2)
+                #                       = zeta ^ (Lcm(d, q - 1) / 2) * zeta ^ (- d / 2).
+                # If d / k is even, the 2-adic valuation of d is greater than
+                # the 2-adic valuation of q - 1, hence det(X ^ i2) = zeta ^ (- d / 2).
+                # Otherwise, the two valuations are the same (since (q - 1) / k
+                # is odd) and we have det(X ^ i2) = - zeta ^ (- d / 2). Since
+                # we have det(EEpsilon) = zeta ^ (d / 2) in the former case an
+                # det(EEpsilon) = - zeta ^ (d / 2) in the latter, we have in
+                # each case det(W) = 1. W ^ 2 is in Z(SL(d, q)).SO(d, q) since
+                # W ^ 2 = X ^ (2 * i2) * EEpsilon ^ 2 
+                #       = (zeta * X ^ (2 * i2)) * (1 / zeta * EEpsilon ^ 2)
+                # and the first factor is in Z(SL(d, q)) while the second in in
+                # SO(d, q). Suppose W were already in Z(SL(d, q)).SO(d, q); then 
+                # there is a scalar S with S * W in SO(d, q) implying
+                # S * X ^ i2 * EEpsilon * gramMatrix * EEpsilon ^ T * X ^ i2 * S
+                # = gramMatrix - but the LHS is 
+                # zeta * (S * X ^ i2) ^ 2 * gramMatrix, which means we must
+                # have zeta * (S * X ^ i2) ^ 2 = IdentityMat - contradiction
+                # since zeta is not a square in GF(q). 
+                W := X ^ i2 * EEpsilon;
+            else
+                # As above, we get det(X ^ i2) = - zeta ^ (- d / 2). Since
+                # det(EEpsilon) = zeta ^ (d / 2) and det(DEpsilon) = -1, we
+                # have det(W) = 1. Similar arguments to the previous case show
+                # that W ^ 2 is in Z(SL(d, q)).SO(d, q) but W is not.
+                W := X ^ i2 * EEpsilon * DEpsilon;
             fi;
         fi;
 
@@ -253,3 +254,93 @@ function(epsilon, d, q)
     SetSize(result, Gcd(q - 1, d) * Size(SO(epsilon, d, q)));
     return result;
 end);
+
+########### EARLIER VERSION -- BROKEN #########################################
+
+# Construction as in Proposition 11.2 of [2]
+# BindGlobal("OrthogonalNormalizerInSL",
+# function(epsilon, d, q)
+#     local generatingScalar, omega, generatorsOfOrthogonalGroup, generators,
+#     result, k, zeta, i1, DEpsilon, EEpsilon, E, X, W, m, i2, n, i3;
+#     if IsEvenInt(q) then
+#         ErrorNoReturn("<q> must be an odd integer but <q> = ", q);
+#     fi;
+#     if d <= 2 then
+#         ErrorNoReturn("This function might not work with <d> <= 2 but <d> = ", d);
+#     fi;
+# 
+#     zeta := PrimitiveElement(GF(q ^ 2));
+#     omega := PrimitiveElement(GF(q));
+# 
+#     generatingScalar := omega ^ QuoInt(q - 1, Gcd(q - 1, d)) * IdentityMat(d, GF(q));
+#     generatorsOfOrthogonalGroup := GeneratorsOfOrthogonalGroup(epsilon, d, q);
+#     # These are A_epsilon, B_epsilon and C in [2]
+#     generators := Concatenation(generatorsOfOrthogonalGroup.generatorsOfSO,
+#                                 [generatingScalar]);
+#     
+#     # We now construct an element W of determinant 1 in 
+#     # SL(d, q) - Z(SL(d, q)).SO(d, q) which has order 2 modulo 
+#     # Z(SL(d, q)).SO(d, q) following Proposition 8.4 of [2]
+#     if IsEvenInt(d) then
+#         # det(DEpsilon) = -1
+#         DEpsilon := generatorsOfOrthogonalGroup.D;
+#         # det(EEpsilon) = (epsilon * omega) ^ (d / 2)
+#         EEpsilon := generatorsOfOrthogonalGroup.E;
+#         k := Gcd(q + 1, d);
+#         X := zeta * IdentityMat(d, GF(q ^ 2));
+#         # det(E) = omega ^ (d / 2) * zeta ^ (-d) 
+#         #        = zeta ^ (d(q - 1) / 2) using omega = zeta ^ (q + 1)
+#         E := EEpsilon * X ^ (-1);
+# 
+#         # We deal with the cases epsilon = +1 and epsilon = -1 simultaneously
+#         if IsEvenInt((q + 1) / k) then
+#             i1 := QuoInt(q ^ 2 - 1, 2 * k);
+#             # det(X ^ i1) = -1 and det(DEpsilon) = -1, hence det(W) = 1.
+#             # Notice W not in Z(SL(d, q)).SO(d, q) - for suppose otherwise,
+#             # then there is a scalar S with det(S) = 1 and SW in SO(d, q), i.e. 
+#             # gramMatrix = SW * gramMatrix * (SW) ^ T 
+#             #            = S * X ^ i1 * (DEpsilon * gramMatrix * DEpsilon ^ T) * X ^ i1 * S 
+#             #            = (S * X ^ i1) ^ 2 * gramMatrix,
+#             # i.e. S * X ^ i1 = +- the identity and hence det(S) = -1, a
+#             # contradiction. Furthermore, W ^ 2 = X ^ (2 * i1) * DEpsilon ^ 2, 
+#             # i.e. a scalar of determinant 1 times an element of SO(d, q).
+#             W := X ^ i1 * DEpsilon;
+#         elif IsEvenInt(d / k) then
+#             m := (q + 1) / k;
+#             i2 := (q - 1) * (m + 1) / 2;
+#             # det(X ^ i2) = zeta ^ (d(q - 1) / 2) = det(E), hence det(W) = 1.
+#             # A similar calculation to the previous case shows that W has
+#             # indeed order 2 mod Z(SL(d, q)).SO(d, q).
+#             W := E * X ^ (-i2);
+#         else
+#             m := d / k;
+#             # Note (m, (q + 1) / k) = 1 since k = (q + 1, d) and m = d / k.
+#             n := 1 / m mod ((q + 1) / k);
+#             i3 := (q - 1) * n * (d + q + 1) / (2 * k);
+#             # An easy, but tedious calculation shows det(X ^ i3) =
+#             # det(DEpsilon * E) = zeta ^ ((d + q + 1)(q - 1) / 2), hence
+#             # det(W) = 1. 
+#             W := DEpsilon * E * X ^ (-i3);
+#             if epsilon = -1 and IsOddInt(d / 2) then
+#                 # If epsilon = -1 and d / 2 is odd, we have 
+#                 # det(EEpsilon) = (-omega) ^ (d / 2) <> omega ^ (d / 2)
+#                 # and thus we need to distinguish this final case. Since
+#                 # det(DEpsilon) = -1, we achieve det(W) = 1 by leaving out the
+#                 # factor DEpsilon.
+#                 W := E * X ^ (-i3);
+#             fi;
+#         fi;
+# 
+#         Add(generators, W);
+#     fi;
+# 
+#     result := Group(generators);
+#     # Size according to Table 2.11 in [1] (note that the structure given in
+#     # Proposition 11.2 of [2] is wrong!)
+#     SetSize(result, Gcd(q - 1, d) * Size(SO(epsilon, d, q)));
+#     return result;
+# end);
+#
+#################################################################################
+
+
