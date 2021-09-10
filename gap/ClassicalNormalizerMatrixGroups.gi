@@ -110,7 +110,7 @@ GeneratorsOfOrthogonalGroups := function(epsilon, n, q)
                                                        [2]);
         D := ReflectionMatrix(n, q, gramMatrix, vectorOfSquareNorm);
         E := DiagonalMat(Concatenation(List([1..n / 2], i -> zeta), 
-                                       List([1..n / 2, i -> 1)));
+                                       List([1..n / 2], i -> 1)));
     elif epsilon = -1 then
     fi;
     
