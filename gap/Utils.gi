@@ -53,4 +53,24 @@ function(entries, field)
                            List([1..dimension], i -> [i, dimension - i + 1, entries[i]]));
 end);
 
+# Solving the congruence a ^ 2 + b ^ 2 = c in F_q by trial and error.
+#
+# A solution always exists by a simple counting argument using the pidgeonhole
+# principle and the fact that there are (q + 1) / 2 > q / 2 squares in F_q (for
+# q odd; the case q even is trivial). The trial and error approach taken here 
+# should in principle almost always terminate quickly: Assuming that - 1 - a ^ 2 
+# is evenly distributed in GF(q), the chance to hit a quadratic residue is about 
+# 1 / 2 in each trial.
+InstallGlobalFunction("SolveQuadraticCongruence",
+function(c, q)
+    local a, b;
+    for a in GF(q) do
+        b := RootFFE(GF(q), (c - a ^ 2) * Z(q) ^ 0, 2);
+        if not b = fail then
+            break;
+        fi;
+    od;
+    return rec(a := a, b := b);
+end);
+
 

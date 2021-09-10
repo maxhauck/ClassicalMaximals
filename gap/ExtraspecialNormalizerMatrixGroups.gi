@@ -73,24 +73,6 @@ OddExtraspecialNormalizerInGL := function(r, m, q)
     return result;
 end;
 
-# Solving the congruence a ^ 2 + b ^ 2 = -1 mod p by trial and error.
-#
-# A solution always exists by a simple counting argument using the pidgeonhole
-# principle and the fact that there are (p + 1) / 2 > p / 2 squares mod p.
-# The trial and error approach taken here should in principle almost always
-# terminate quickly: Assuming that - 1 - a ^ 2 is evenly distributed in GF(p),
-# the chance to hit a quadratic residue is about 1 / 2 in each trial.
-SolveQuadraticCongruence := function(p)
-    local a, b;
-    for a in [0..p - 1] do
-        b := RootFFE(GF(p), (-1 - a ^ 2) * Z(p) ^ 0, 2);
-        if not b = fail then
-            break;
-        fi;
-    od;
-    return rec(a := a, b := b);
-end;
-
 # Construction as in Lemma 9.3 of [2]
 SymplecticTypeNormalizerInGL := function(m, q)
     local listOfUi, U, result, zeta, psi; 

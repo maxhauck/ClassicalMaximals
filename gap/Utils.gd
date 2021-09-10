@@ -14,3 +14,4 @@ DeclareGlobalFunction("MatrixByEntries");
 
 DeclareGlobalFunction("ChangeFixedSesquilinearForm");
 DeclareGlobalFunction("AntidiagonalMat");
+DeclareGlobalFunction("SolveQuadraticCongruence");

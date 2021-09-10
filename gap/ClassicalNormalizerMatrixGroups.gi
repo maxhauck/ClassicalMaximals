@@ -90,8 +90,9 @@ end;
 # General Linear Group." Experimental Mathematics, vol. 13 no. 2, 2004, pp.
 # 151-163. Lemma 2.4.
 # We take the notation from [2].
-GeneratorsOfOrthogonalGroups := function(epsilon, n, q)
-    local gramMatrix, generatorsOfSO, vectorOfSquareNorm, D, zeta;
+GeneratorsOfOrthogonalGroup := function(epsilon, n, q)
+    local gramMatrix, generatorsOfSO, vectorOfSquareNorm, D, E, zeta, a, b,
+    solutionOfQuadraticCongruence;
     if IsOddInt(n) or IsEvenInt(q) then
         ErrorNoReturn("This function was only designed for <n> even and <q>",
                       " odd but <n> = ", n, "and <q> = ", q);
@@ -101,7 +102,7 @@ GeneratorsOfOrthogonalGroups := function(epsilon, n, q)
     if epsilon = 1 then
         gramMatrix := AntidiagonalMat(List([1..n], i -> 1), GF(q));
         generatorsOfSO := GeneratorsOfGroup(ChangeFixedSesquilinearForm(SO(epsilon, n, q),
-                                            gramMatrix));
+                                                                        gramMatrix));
         # Our standard bilinear form is given by the Gram matrix 
         # Antidiag(1, ..., 1). The norm of [1, 0, ..., 0, 2] under this
         # bilinear form is 4, i.e. a square. (Recall q odd, so this is not zero!)
@@ -112,7 +113,94 @@ GeneratorsOfOrthogonalGroups := function(epsilon, n, q)
         E := DiagonalMat(Concatenation(List([1..n / 2], i -> zeta), 
                                        List([1..n / 2], i -> 1)));
     elif epsilon = -1 then
+
+        # Get a, b in GF(q) with a ^ 2 + b ^ 2 = zeta
+        solutionQuadraticCongruence := SolveQuadraticCongruence(zeta, q);
+        a := solutionOfQuadraticCongruence.a;
+        b := solutionOfQuadraticCongruence.b;
+
+        if IsOddInt(n * (q - 1) / 4) then
+            gramMatrix := IdentityMat(n, GF(q));
+            generatorsOfSO := GeneratorsOfGroup(ChangeFixedSesquilinearForm(SO(epsilon, n, q),
+                                                                            gramMatrix));
+            # Our standard bilinear form is given by the Gram matrix 
+            # Diag(1, ..., 1). The norm of [1, 0, ..., 0] under this bilinear
+            # form is 1, i.e. a square.
+            vectorOfSquareNorm := zeta ^ 0 * Concatenation([1], 
+                                                           List([1..n - 1], i -> 0));
+            D := ReflectionMatrix(n, q, gramMatrix, vectorOfSquareNorm);
+            # Block diagonal matrix consisting of n / 2 blocks of the form 
+            # [[a, b], [b, -a]].
+            E := MatrixByEntries(GF(q), n, n, 
+                                 Concatenation(List([1..n], i -> [i, i, (-1) ^ (i + 1) * a]), 
+                                               List([1..n], i -> [i, i + (-1) ^ (i + 1), b])));
+        else
+            gramMatrix := Z(q) ^ 0 * DiagonalMat(Concatenation([zeta],
+                                                               List([1..n - 1], i -> 1)));
+            generatorsOfSO := GeneratorsOfGroup(ChangeFixedSesquilinearForm(SO(epsilon, n, q),
+                                                                            gramMatrix));
+            # Our standard bilinear form is given by the Gram matrix 
+            # Diag(zeta, 1, ..., 1). The norm of [0, ..., 0, 1] under this
+            # bilinear form is 1, i.e. a square.
+            vectorOfSquareNorm := zeta ^ 0 * Concatenation(List([1..n - 1], i -> 0), 
+                                                           [1]);
+            D := ReflectionMatrix(n, q, gramMatrix, vectorOfSquareNorm);
+            # Block diagonal matrix consisting of one block [[0, zeta], [1, 0]]
+            # and n / 2 - 1 blocks of the form [[a, b], [b, -a]].
+            E := MatrixByEntries(GF(q), n, n, 
+                                 Concatenation([[1, 2, zeta], [2, 1, zeta ^ 0]],
+                                               List([3..n], i -> [i, i, (-1) ^ (i + 1) * a]), 
+                                               List([3..n], i -> [i, i + (-1) ^ (i + 1), b])));
+        fi;
     fi;
     
     return rec(generatorsOfSO := generatorsOfSO, D := D, E := E);
 end;
+
+# Construction as in Proposition 11.2 of [2]
+BindGlobal("OrthogonalNormalizerInSL",
+function(epsilon, d, q)
+    local generatingScalar, zeta, generatorsOfOrthogonalGroup, generators,
+    result, k;
+    if IsEvenInt(q) then
+        ErrorNoReturn("<q> must be an odd integer but <q> = ", q);
+    fi;
+
+    zeta := PrimitiveElement(GF(q));
+
+    generatingScalar := zeta ^ QuoInt(q - 1, Gcd(q - 1, d)) * IdentityMat(d, GF(q));
+    generatorsOfOrthogonalGroup := GeneratorsOfOrthogonalGroup(epsilon, d, q);
+    # These are A_epsilon, B_epsilon and C in [2]
+    generators := Concatenation(generatorsOfOrthogonalGroup.generatorsOfSO,
+                                [generatingScalar]);
+
+    if IsEvenInt(d) then
+        k := Gcd(q + 1, d);
+        if epsilon = +1 then
+            if IsEvenInt((q + 1) / k) then
+            elif IsEvenInt(d / k) then
+            else
+            fi;
+        elif epsilon = -1 then
+            if IsEvenInt((q + 1) / k) then
+            elif IsEvenInt(d / k) then
+            # Now q + 1 and d have the same 2-adic valuation
+            elif IsEvenInt(d / 2) then
+            else
+            fi;
+        fi;
+    fi;
+
+    result := Group(generators);
+    if IsOddInt(d) then
+        SetSize(result, Gcd(q - 1, d) * Size(SO(epsilon, d, q)));
+    else
+        # TODO
+        # According to [1], the size of these subgroups is always 
+        # (q - 1, d) * |SO(epsilon, d, q)|, but [2] says that there is an
+        # additional factor of 2 in the case d even. In fact, this additional
+        # factor of 2 is the only reason for all this mumbo jumbo above.
+        SetSize(result, Gcd(q - 1, d) * Size(SO(epsilon, d, q)) * 2);
+    fi;
+    return result;
+end);
