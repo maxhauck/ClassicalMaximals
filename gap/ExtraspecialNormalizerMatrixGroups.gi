@@ -116,7 +116,7 @@ Extraspecial2MinusTypeNormalizerInGL := function(m, q)
     result := OddExtraspecialNormalizerInGL(2, m, q);
    
     p := PrimeDivisors(q)[1];
-    solutionQuadraticCongruence := SolveQuadraticCongruence(p);
+    solutionQuadraticCongruence := SolveQuadraticCongruence(-1, p);
     a := solutionQuadraticCongruence.a; 
     b := solutionQuadraticCongruence.b;
 
